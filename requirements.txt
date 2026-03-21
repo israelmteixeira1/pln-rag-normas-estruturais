@@ -1,0 +1,26 @@
+# =============================================================================
+# Fase 2 — RAG Normas Estruturais: Corpus, Chunking e Índice
+# =============================================================================
+# Instalação: pip install -r requirements.txt
+# Para Google Colab: !pip install -r requirements.txt
+
+# --- Extração de PDF ---
+pdfplumber>=0.11.0         # extração de texto e tabelas de PDFs
+
+# --- Chunking ---
+langchain-text-splitters>=0.3.0  # RecursiveCharacterTextSplitter hierárquico
+
+# --- Embeddings (PT-BR técnico) ---
+sentence-transformers>=3.0.0     # modelo neuralmind/bert-base-portuguese-cased
+torch>=2.0.0                     # backend PyTorch para sentence-transformers
+
+# --- Índice Vetorial ---
+# macOS arm64: versões >= 1.8 requerem `swig` para compilar do zero.
+# Use 1.7.4 que tem wheel pré-compilado. Alternativa: brew install swig
+# Google Colab (Linux x86_64): qualquer versão funciona normalmente.
+faiss-cpu==1.7.4
+
+# --- Utilitários ---
+numpy>=1.26.0
+pandas>=2.0.0
+tqdm>=4.66.0

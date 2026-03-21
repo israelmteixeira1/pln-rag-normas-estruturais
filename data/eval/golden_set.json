@@ -1,0 +1,161 @@
+[
+  {
+    "id": 1,
+    "pergunta": "Qual o valor típico de carga acidental para um pavimento de escritório?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#Tabela_X",
+    "comentario": "Busca valor numérico específico na NBR 6120."
+  },
+  {
+    "id": 2,
+    "pergunta": "Qual o valor de carga acidental para uma garagem de veículos leves?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#Tabela_Y",
+    "comentario": "Verifica precisão em tabelas de cargas acidentais."
+  },
+  {
+    "id": 3,
+    "pergunta": "Quando é permitido reduzir as cargas acidentais em um edifício?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#Reducao_Cargas",
+    "comentario": "Busca por condições normativas de alívio de carga."
+  },
+  {
+    "id": 4,
+    "pergunta": "O peso próprio da estrutura deve ser considerado como que tipo de ação?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#Acoes_Permanentes",
+    "comentario": "Conceito básico de ações permanentes."
+  },
+  {
+    "id": 5,
+    "pergunta": "Como estimar o peso específico de um material que não está tabelado?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#Metodologia_Estimativa",
+    "comentario": "Verifica instrução normativa para materiais genéricos."
+  },
+  {
+    "id": 6,
+    "pergunta": "Em uma cobertura acessível, qual tipo de carga variável deve ser considerada?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#Coberturas",
+    "comentario": "Diferenciação entre tipos de uso de cobertura."
+  },
+  {
+    "id": 7,
+    "pergunta": "Em uma cobertura não acessível, ainda é necessário considerar carga variável?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#Coberturas_Nao_Acessiveis",
+    "comentario": "Validação de valores mínimos de manutenção."
+  },
+  {
+    "id": 8,
+    "pergunta": "Como considerar a presença de paredes divisórias que não têm posição definida em projeto?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#Divisorias_Moveis",
+    "comentario": "Cálculo de carga linear equivalente ou distribuída."
+  },
+  {
+    "id": 9,
+    "pergunta": "Qual a diferença entre carga distribuída e carga concentrada no dimensionamento?",
+    "categoria": "multi_trecho",
+    "evidencia_esperada": [
+      "NBR6120#Definicoes",
+      "NBR6118#Dimensionamento"
+    ],
+    "comentario": "Exige síntese entre definições de carga e aplicação estrutural."
+  },
+  {
+    "id": 10,
+    "pergunta": "Como determinar a velocidade básica do vento em uma região?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#Isopletas",
+    "comentario": "Uso de mapas de isopletas (Velocidade $V_0$)."
+  },
+  {
+    "id": 11,
+    "pergunta": "Quais fatores influenciam a velocidade de cálculo do vento além da velocidade básica?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#Fatores_S1_S2_S3",
+    "comentario": "Identificação dos fatores topográfico, rugosidade e estatístico."
+  },
+  {
+    "id": 12,
+    "pergunta": "Qual a diferença entre pressão positiva e sucção do vento em uma edificação?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#Coeficientes_Pressao",
+    "comentario": "Conceito de pressão externa e interna."
+  },
+  {
+    "id": 13,
+    "pergunta": "Como considerar o efeito do vento no interior de uma edificação?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#Pressao_Interna",
+    "comentario": "Cálculo de permeabilidade e aberturas."
+  },
+  {
+    "id": 14,
+    "pergunta": "Em quais situações é necessário realizar estudos específicos (como túnel de vento)?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#Ensaios_Modelo_Reduzido",
+    "comentario": "Critérios de esbeltez e geometria complexa."
+  },
+  {
+    "id": 15,
+    "pergunta": "O que caracteriza uma ação permanente indireta?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6118#Acoes_Permanentes_Indiretas",
+    "comentario": "Conceitos como recalques de apoio e retração."
+  },
+  {
+    "id": 16,
+    "pergunta": "Como a retração do concreto deve ser considerada no projeto estrutural?",
+    "categoria": "multi_trecho",
+    "evidencia_esperada": [
+      "NBR6118#Retracao",
+      "NBR6118#Efeitos_Termicos"
+    ],
+    "comentario": "Exige combinar causas e formas de cálculo."
+  },
+  {
+    "id": 17,
+    "pergunta": "Qual a diferença entre estados-limite últimos e estados-limite de serviço?",
+    "categoria": "multi_trecho",
+    "evidencia_esperada": [
+      "NBR6118#ELU",
+      "NBR6118#ELS"
+    ],
+    "comentario": "Diferenciação entre segurança estrutural e conforto/durabilidade."
+  },
+  {
+    "id": 18,
+    "pergunta": "Em uma combinação de ações, qual tipo de carregamento geralmente entra como ação principal?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6118#Combinacoes",
+    "comentario": "Regras de majoração e simultaneidade."
+  },
+  {
+    "id": 19,
+    "pergunta": "Quando o vento pode se tornar a ação dominante no dimensionamento?",
+    "categoria": "multi_trecho",
+    "evidencia_esperada": [
+      "NBR6123#Esbeltez",
+      "NBR6118#Estabilidade_Global"
+    ],
+    "comentario": "Análise de sensibilidade a cargas horizontais."
+  },
+  {
+    "id": 20,
+    "pergunta": "Em estruturas altas e esbeltas, por que a análise puramente estática pode não ser suficiente?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#Efeitos_Dinamicos",
+    "comentario": "Necessidade de análise dinâmica (ressonância e rajadas)."
+  },
+  {
+    "id": 21,
+    "pergunta": "Como calcular o preço do m³ de concreto para uma obra em Brasília?",
+    "categoria": "fora_do_corpus",
+    "evidencia_esperada": null,
+    "comentario": "Teste de recusa adequada (não é tema normativo)[cite: 91, 101]."
+  }
+]
