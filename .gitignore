@@ -1,0 +1,16 @@
+# Bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Índice e artefatos gerados pelo notebook
+index/
+
+# Ambiente
+.venv/
+venv/
+.env
+.env.*
