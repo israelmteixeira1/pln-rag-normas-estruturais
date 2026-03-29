@@ -18,13 +18,13 @@ torch>=2.0.0                     # backend PyTorch para sentence-transformers
 # macOS arm64: versões >= 1.8 requerem `swig` para compilar do zero.
 # Use 1.7.4 que tem wheel pré-compilado. Alternativa: brew install swig
 # Google Colab (Linux x86_64): qualquer versão funciona normalmente.
-faiss-cpu>=1.7.4
+faiss-cpu==1.7.4
 
 # --- Buscas Híbridas (BM25 + Embedding) ---
 rank-bm25>=0.2.2                # BM25 para busca léxica (hybrid search)
 
 # --- Utilitários ---
-numpy>=1.26.0
+numpy>=1.26.0,<2.0.0          # NumPy 2.x incompatível com o ABI C++ do faiss 1.7.4
 pandas>=2.0.0
 tqdm>=4.66.0
 
