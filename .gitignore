@@ -13,7 +13,6 @@ index/
 .venv/
 venv/
 .env
-.env.*
 
 # Git worktrees
 .worktrees/
