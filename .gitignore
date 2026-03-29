@@ -14,3 +14,7 @@ index/
 venv/
 .env
 .env.*
+
+# Git worktrees
+.worktrees/
+.DS_Store

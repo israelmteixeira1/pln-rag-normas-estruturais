@@ -18,9 +18,29 @@ torch>=2.0.0                     # backend PyTorch para sentence-transformers
 # macOS arm64: versões >= 1.8 requerem `swig` para compilar do zero.
 # Use 1.7.4 que tem wheel pré-compilado. Alternativa: brew install swig
 # Google Colab (Linux x86_64): qualquer versão funciona normalmente.
-faiss-cpu==1.7.4
+faiss-cpu>=1.7.4
+
+# --- Buscas Híbridas (BM25 + Embedding) ---
+rank-bm25>=0.2.2                # BM25 para busca léxica (hybrid search)
 
 # --- Utilitários ---
 numpy>=1.26.0
 pandas>=2.0.0
 tqdm>=4.66.0
+
+# =============================================================================
+# Fase 3 — Pipeline RAG e Interface (Trilha E)
+# =============================================================================
+
+# --- LLM (Google Gemini) ---
+google-genai>=1.0.0           # API client para Google Gemini (nova SDK unificada)
+
+# --- Interface Web ---
+streamlit>=1.38.0             # interface do chatbot
+watchdog>=3.0.0               # monitoramento de arquivos (Streamlit live reload)
+
+# --- Configuração ---
+python-dotenv>=1.0.0          # carregamento de .env (API keys)
+
+# --- Desenvolvimento / Notebooks ---
+notebook>=7.0.0               # Jupyter Notebook
