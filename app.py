@@ -10,7 +10,15 @@ Executar com:
 from __future__ import annotations
 
 import streamlit as st
+import threading
+import time
 from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# Armazenamento thread-safe para resultado da consulta em background
+# (evita escrita em st.session_state fora da thread principal)
+# ---------------------------------------------------------------------------
+_query_store: dict = {"result": None, "cancelled": False}
 
 # ---------------------------------------------------------------------------
 # Configuração da página (DEVE ser a primeira chamada Streamlit)
@@ -212,9 +220,14 @@ with st.sidebar:
         "Como calcular o preço do m³ de concreto?",
     ]
 
+    def _set_demo(q: str):
+        st.session_state["question_box"] = q
+
     for dq in demo_questions:
-        if st.button(dq, key=f"demo_{dq[:30]}", use_container_width=True):
-            st.session_state["question_input"] = dq
+        st.button(
+            dq, key=f"demo_{dq[:30]}", use_container_width=True,
+            on_click=_set_demo, args=(dq,),
+        )
 
     st.markdown('<div class="separator"></div>', unsafe_allow_html=True)
 
@@ -241,29 +254,72 @@ with st.spinner("🔄 Carregando pipeline RAG (primeira vez pode demorar)..."):
 # ---------------------------------------------------------------------------
 question = st.text_area(
     "💬 Faça sua pergunta técnica sobre normas estruturais:",
-    value=st.session_state.get("question_input", ""),
     height=80,
     placeholder="Ex.: Qual o valor de carga acidental para um pavimento de escritório?",
     key="question_box",
 )
 
-col_submit, col_clear = st.columns([1, 5])
+running = st.session_state.get("running", False)
+
+def _clear():
+    st.session_state["question_box"] = ""
+    st.session_state["last_result"] = None
+
+col_submit, col_cancel, col_clear = st.columns([1, 1, 4])
 with col_submit:
-    submit = st.button("🔍 Consultar", type="primary", use_container_width=True)
+    submit = st.button("🔍 Consultar", type="primary", use_container_width=True, disabled=running)
+with col_cancel:
+    cancel = st.button("❌ Cancelar", use_container_width=True, disabled=not running)
 with col_clear:
-    if st.button("🗑️ Limpar"):
-        st.session_state["question_input"] = ""
-        st.session_state["last_result"] = None
-        st.rerun()
+    st.button("🗑️ Limpar", on_click=_clear, disabled=running)
 
 # ---------------------------------------------------------------------------
-# Executa consulta
+# Cancelar consulta em andamento
+# ---------------------------------------------------------------------------
+if cancel and running:
+    _query_store["cancelled"] = True
+    st.session_state["running"] = False
+    st.rerun()
+
+# ---------------------------------------------------------------------------
+# Inicia consulta em thread separada
 # ---------------------------------------------------------------------------
 if submit and question.strip():
-    with st.spinner("Consultando normas..."):
-        retriever = load_hybrid_retriever() if mode == "hybrid" else None
-        result = pipeline.query(question.strip(), k=k, mode=mode, retriever=retriever)
-        st.session_state["last_result"] = result
+    _q = question.strip()
+    _k, _mode = k, mode
+    _retriever = load_hybrid_retriever() if mode == "hybrid" else None
+    _query_store["result"] = None
+    _query_store["cancelled"] = False
+    st.session_state["running"] = True
+
+    def _run_query():
+        try:
+            res = pipeline.query(_q, k=_k, mode=_mode, retriever=_retriever)
+        except Exception as e:
+            res = {
+                "answer": f"⚠️ Erro na consulta: {e}",
+                "sources": [], "mode": _mode, "k": _k,
+                "latency": {"retrieval_s": 0, "generation_s": 0, "total_s": 0},
+            }
+        if not _query_store["cancelled"]:
+            _query_store["result"] = res
+
+    threading.Thread(target=_run_query, daemon=True).start()
+    st.rerun()
+
+# ---------------------------------------------------------------------------
+# Polling enquanto consulta roda
+# ---------------------------------------------------------------------------
+if st.session_state.get("running"):
+    if _query_store["result"] is not None:
+        st.session_state["last_result"] = _query_store["result"]
+        _query_store["result"] = None
+        st.session_state["running"] = False
+        st.rerun()
+    else:
+        with st.spinner("Consultando normas..."):
+            time.sleep(0.3)
+        st.rerun()
 
 # ---------------------------------------------------------------------------
 # Exibe resultado
