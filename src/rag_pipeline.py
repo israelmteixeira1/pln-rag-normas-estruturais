@@ -8,13 +8,15 @@ Fluxo
 1. Recebe pergunta do usuário
 2. Recupera top-k chunks mais relevantes via retriever FAISS
 3. Monta prompt com grounding explícito (trechos normativos como contexto)
-4. Envia ao LLM (Google Gemini) para geração de resposta
+4. Envia ao LLM (Google Gemini ou Groq) para geração de resposta
 5. Retorna resposta com citações normativas + metadados de latência
 
 Pré-requisitos
 --------------
 - Índice FAISS construído (execute build_index() e save_index())
-- API key do Google Gemini em ``.env`` ou variável de ambiente ``GEMINI_API_KEY``
+- API key em ``.env``:
+  - Gemini: ``GEMINI_API_KEY``
+  - Groq:   ``GROQ_API_KEY``  (provider="groq")
 """
 
 from __future__ import annotations
@@ -24,7 +26,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-from google import genai
 from dotenv import load_dotenv
 
 from src.indexer import load_index, retrieve
@@ -40,15 +41,14 @@ load_dotenv(_PROJECT_ROOT / ".env")
 # Configurações padrão
 # ---------------------------------------------------------------------------
 GEMINI_MODEL = "gemini-2.0-flash"
+GROQ_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 
 
 class RAGPipeline:
     """
     Pipeline RAG completo para consulta de normas estruturais.
 
-    Conecta o retriever FAISS (construído na Trilha I) ao Google Gemini,
-    com prompts de grounding que forçam respostas baseadas exclusivamente
-    nos trechos normativos recuperados.
+    Suporta Google Gemini (provider='gemini') e Groq (provider='groq').
 
     Attributes
     ----------
@@ -58,18 +58,20 @@ class RAGPipeline:
         Metadados dos chunks indexados.
     embed_model : SentenceTransformer
         Modelo de embedding para codificar queries.
-    llm_model : genai.GenerativeModel
-        Modelo Google Gemini para geração de respostas.
     mode : str
         Modo padrão do pipeline: ``'baseline'`` ou ``'improved'``.
+    provider : str
+        Provider LLM: ``'gemini'`` ou ``'groq'``.
     """
 
     def __init__(
         self,
         api_key: str | None = None,
         gemini_model: str = GEMINI_MODEL,
+        groq_model: str = GROQ_MODEL,
         mode: str = "baseline",
         index_dir: str | Path | None = None,
+        provider: str = "groq",
     ):
         """
         Inicializa o pipeline RAG.
@@ -77,41 +79,76 @@ class RAGPipeline:
         Parâmetros
         ----------
         api_key : str | None
-            API key do Google Gemini. Se None, usa ``GEMINI_API_KEY`` do
-            ambiente / ``.env``.
+            API key do provider. Se None, usa a variável de ambiente
+            correspondente (``GROQ_API_KEY`` ou ``GEMINI_API_KEY``).
         gemini_model : str
-            Nome do modelo Gemini (padrão: ``gemini-2.0-flash``).
+            Modelo Gemini (padrão: ``gemini-2.0-flash``).
+        groq_model : str
+            Modelo Groq (padrão: ``meta-llama/llama-4-scout-17b-16e-instruct``).
         mode : str
             Modo padrão: ``'baseline'`` ou ``'improved'``.
         index_dir : str | Path | None
             Diretório do índice FAISS. Se None, usa o padrão (``index/``).
+        provider : str
+            Provider LLM: ``'groq'`` (padrão) ou ``'gemini'``.
 
         Raises
         ------
         ValueError
-            Se nenhuma API key for encontrada.
+            Se nenhuma API key for encontrada ou provider inválido.
         FileNotFoundError
-            Se o índice FAISS não existir (execute build_index() e save_index()).
+            Se o índice FAISS não existir.
         """
-        # --- Configura Google Gemini ---
-        key = api_key or os.getenv("GEMINI_API_KEY")
-        if not key:
-            raise ValueError(
-                "API key do Gemini não encontrada. "
-                "Configure GEMINI_API_KEY no arquivo .env ou passe api_key=."
-            )
-        self.llm_client = genai.Client(api_key=key)
-        self._gemini_model = gemini_model
+        self.provider = provider.lower()
         self.mode = mode
 
+        if self.provider == "groq":
+            from groq import Groq
+            key = api_key or os.getenv("GROQ_API_KEY")
+            if not key:
+                raise ValueError(
+                    "GROQ_API_KEY não encontrada. Configure no .env ou passe api_key=."
+                )
+            self.llm_client = Groq(api_key=key)
+            self._model = groq_model
+
+        elif self.provider == "gemini":
+            from google import genai
+            key = api_key or os.getenv("GEMINI_API_KEY")
+            if not key:
+                raise ValueError(
+                    "GEMINI_API_KEY não encontrada. Configure no .env ou passe api_key=."
+                )
+            self.llm_client = genai.Client(api_key=key)
+            self._model = gemini_model
+
+        else:
+            raise ValueError(f"Provider inválido: '{provider}'. Use 'groq' ou 'gemini'.")
+
         # --- Carrega índice FAISS + modelo de embedding ---
-        print(f"[rag] Inicializando pipeline RAG (modo={mode})...")
+        print(f"[rag] Inicializando pipeline RAG (provider={self.provider}, modo={mode})...")
         if index_dir:
             self.index, self.chunks, self.embed_model = load_index(index_dir)
         else:
             self.index, self.chunks, self.embed_model = load_index()
 
         print(f"[rag] Pipeline pronto. {self.index.ntotal} chunks indexados.")
+
+    def _call_llm(self, prompt: str) -> str:
+        """Chama o LLM configurado e retorna o texto da resposta."""
+        if self.provider == "groq":
+            response = self.llm_client.chat.completions.create(
+                model=self._model,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            return response.choices[0].message.content
+
+        # gemini
+        response = self.llm_client.models.generate_content(
+            model=self._model,
+            contents=prompt,
+        )
+        return response.text
 
     def query(
         self,
@@ -164,7 +201,7 @@ class RAGPipeline:
         context = format_context(results)
         prompt = build_prompt(question, context, mode=current_mode)
 
-        # 3. Geração de resposta via Google Gemini (com retry para rate limits)
+        # 3. Geração de resposta (com retry para rate limits)
         t1 = time.time()
         answer = ""
         max_retries = 3
@@ -172,11 +209,7 @@ class RAGPipeline:
 
         for attempt in range(max_retries + 1):
             try:
-                response = self.llm_client.models.generate_content(
-                    model=self._gemini_model,
-                    contents=prompt,
-                )
-                answer = response.text
+                answer = self._call_llm(prompt)
                 break  # sucesso — sai do loop
             except Exception as e:
                 error_msg = str(e)
@@ -190,7 +223,7 @@ class RAGPipeline:
                     time.sleep(wait)
                 else:
                     answer = (
-                        f"⚠️ Erro na geração de resposta: {e}\n\n"
+                        f"Erro na geração de resposta: {e}\n\n"
                         "Verifique sua API key e conexão com a internet."
                     )
                     break
