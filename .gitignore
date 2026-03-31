@@ -4,10 +4,10 @@ __pycache__/
 *.pyo
 
 # Jupyter
-.ipynb_checkpoints/
+# .ipynb_checkpoints/
 
 # Índice e artefatos gerados pelo notebook
-index/
+# index/
 
 # Ambiente
 .venv/
