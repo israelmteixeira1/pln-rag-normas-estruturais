@@ -297,6 +297,55 @@ def save_evaluation_report(
     return output_path
 
 
+def run_comparative_evaluation(
+    faiss_retrieve_fn,
+    sparse_retrieve_fn,
+    hybrid_retrieve_fn,
+    golden_set: list[dict] | None = None,
+    k_values: list[int] = EVAL_K_VALUES,
+    golden_set_path: str | Path = GOLDEN_SET_PATH,
+) -> dict:
+    """
+    Executa avaliação comparativa Recall@k para os 3 modos de retrieval:
+    dense (FAISS), sparse (BM25) e hybrid (BM25+FAISS+RRF).
+
+    Retorna
+    -------
+    dict com:
+    - ``modes``       : dict {mode_name: resultado de run_evaluation()}
+    - ``comparison``  : pd.DataFrame com recall@k lado a lado
+    """
+    if golden_set is None:
+        golden_set = load_golden_set(golden_set_path)
+
+    modes = {
+        "dense":  run_evaluation(faiss_retrieve_fn,   golden_set, k_values),
+        "sparse": run_evaluation(sparse_retrieve_fn,  golden_set, k_values),
+        "hybrid": run_evaluation(hybrid_retrieve_fn,  golden_set, k_values),
+    }
+
+    # Tabela comparativa
+    rows = []
+    for k in k_values:
+        row = {"k": k}
+        for mode_name, res in modes.items():
+            row[f"recall@{k}_{mode_name}"] = round(res["recall_at_k"][k], 4)
+        rows.append(row)
+
+    comparison_df = pd.DataFrame(rows)
+
+    return {"modes": modes, "comparison": comparison_df}
+
+
+def print_comparative_report(comp_results: dict) -> None:
+    """Exibe relatório comparativo dos 3 modos."""
+    print(f"\n{'='*70}")
+    print("  AVALIAÇÃO COMPARATIVA — RECALL@K (dense vs sparse vs hybrid)")
+    print(f"{'='*70}")
+    print(comp_results["comparison"].to_string(index=False))
+    print(f"{'='*70}\n")
+
+
 if __name__ == "__main__":
     # Execução direta: avalia o retriever com o golden_set
     from src.indexer import load_index, retrieve as _retrieve

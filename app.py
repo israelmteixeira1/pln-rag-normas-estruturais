@@ -148,6 +148,15 @@ def load_hybrid_retriever():
     return HybridRetriever(chunks, index, embed_model)
 
 
+@st.cache_resource(show_spinner=False)
+def load_sparse_retriever():
+    """Carrega o SparseRetriever (BM25 puro) cacheado."""
+    from src.hybrid_search import SparseRetriever
+    from src.indexer import load_index
+    _, chunks, _ = load_index()
+    return SparseRetriever(chunks)
+
+
 # ---------------------------------------------------------------------------
 # Header
 # ---------------------------------------------------------------------------
@@ -180,15 +189,14 @@ with st.sidebar:
     st.markdown("### ⚙️ Configurações")
 
     mode = st.radio(
-        "Modo do prompt",
-        options=["baseline", "improved", "hybrid"],
+        "Modo do retriever",
+        options=["baseline", "improved", "sparse", "hybrid"],
         index=0,
         help=(
-            "**Baseline**: prompt direto com grounding (retriever FAISS).\n\n"
-            "**Improved**: prompt com chain-of-thought e "
-            "verificação cruzada entre normas (retriever FAISS).\n\n"
-            "**Hybrid**: BM25+FAISS com Reciprocal Rank Fusion "
-            "(prompt improved)."
+            "**Baseline**: FAISS denso + prompt direto.\n\n"
+            "**Improved**: FAISS denso + prompt chain-of-thought.\n\n"
+            "**Sparse**: BM25 puro (léxico, sem embeddings).\n\n"
+            "**Hybrid**: BM25+FAISS com Reciprocal Rank Fusion (RRF)."
         ),
     )
 
@@ -232,7 +240,7 @@ with st.sidebar:
         "---\n"
         "Modelo de embedding: `bert-base-portuguese-cased`\n\n"
         "Índice: FAISS (cosseno)\n\n"
-        "LLM: Google Gemini Flash"
+        "LLM: Groq — llama-4-scout-17b"
     )
 
 # ---------------------------------------------------------------------------
@@ -265,7 +273,12 @@ with col_clear:
 # Executa consulta sincronamente (Groq ~1s — threading desnecessário)
 # ---------------------------------------------------------------------------
 if submit and question.strip():
-    _retriever = load_hybrid_retriever() if mode == "hybrid" else None
+    if mode == "hybrid":
+        _retriever = load_hybrid_retriever()
+    elif mode == "sparse":
+        _retriever = load_sparse_retriever()
+    else:
+        _retriever = None
     with st.spinner("Consultando normas..."):
         try:
             res = pipeline.query(question.strip(), k=k, mode=mode, retriever=_retriever)

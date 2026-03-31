@@ -27,6 +27,43 @@ def _tokenize(text: str) -> list[str]:
     return [tok for tok in re.split(r"\W+", text.lower()) if tok]
 
 
+class SparseRetriever:
+    """
+    Retriever esparso usando BM25 (sem FAISS).
+    Interface idêntica a HybridRetriever para compatibilidade com rag_pipeline.py.
+    """
+
+    def __init__(self, chunks: list[dict]) -> None:
+        self.chunks = chunks
+        tokenized_corpus = [_tokenize(chunk["texto"]) for chunk in chunks]
+        self.bm25 = BM25Okapi(tokenized_corpus)
+
+    def retrieve(self, query: str, k: int = 5) -> list[dict]:
+        """
+        Retorna top-k chunks usando BM25 puro.
+
+        Parâmetros
+        ----------
+        query : str
+        k : int
+
+        Retorna
+        -------
+        list[dict] com rank, chunk_id, doc_id, secao, score, texto
+        """
+        tokenized_query = _tokenize(query)
+        scores = self.bm25.get_scores(tokenized_query)
+        top_indices = np.argsort(scores)[::-1][:k]
+
+        results = []
+        for rank, idx in enumerate(top_indices, start=1):
+            chunk = self.chunks[int(idx)].copy()
+            chunk["rank"] = rank
+            chunk["score"] = float(scores[int(idx)])
+            results.append(chunk)
+        return results
+
+
 class HybridRetriever:
     """
     Retriever híbrido que combina BM25 (léxico) e FAISS (semântico)

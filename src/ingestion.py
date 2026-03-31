@@ -100,6 +100,10 @@ def extract_text_from_pdf(pdf_path: str | Path) -> list[dict[str, Any]]:
 
     Tabelas são extraídas separadamente e concatenadas abaixo do texto
     da página para preservar o contexto numérico (valores, unidades).
+    O texto corrido é extraído apenas das regiões fora das tabelas,
+    evitando duplicação de conteúdo tabular no texto principal.
+
+    Nota: o índice vetorial deve ser reconstruído após re-executar a ingestão.
 
     Parâmetros
     ----------
@@ -116,21 +120,41 @@ def extract_text_from_pdf(pdf_path: str | Path) -> list[dict[str, Any]]:
 
     with pdfplumber.open(pdf_path) as pdf:
         for i, page in enumerate(pdf.pages, start=1):
-            # Extrai texto corrido da página
-            raw_text = page.extract_text() or ""
+            # Detecta bounding boxes das tabelas para excluir da extração de texto
+            found_tables = page.find_tables()
+            table_bboxes = [t.bbox for t in found_tables]
+
+            # Filtra caracteres que estão dentro de alguma tabela
+            def not_in_tables(obj):
+                for bbox in table_bboxes:
+                    x0, top, x1, bottom = bbox
+                    if (obj.get("x0", 0) >= x0 - 2 and
+                            obj.get("x1", 0) <= x1 + 2 and
+                            obj.get("top", 0) >= top - 2 and
+                            obj.get("bottom", 0) <= bottom + 2):
+                        return False
+                return True
+
+            filtered_page = page.filter(not_in_tables)
+            raw_text = filtered_page.extract_text(x_tolerance=3, y_tolerance=3) or ""
 
             # Extrai tabelas e serializa como texto TSV para preservar
-            # os valores e unidades sem perder a estrutura matricial
+            # os valores e unidades sem perder a estrutura matricial.
+            # Páginas de índice/sumário (detectadas pela abundância de "......")
+            # não recebem bloco de tabela para evitar ruído.
+            is_toc_page = raw_text.count("......") > 5
+
             table_texts: list[str] = []
-            for table in page.extract_tables():
-                rows = []
-                for row in table:
-                    cleaned = [
-                        str(cell).strip() if cell else "" for cell in row
-                    ]
-                    rows.append("\t".join(cleaned))
-                if rows:
-                    table_texts.append("[TABELA]\n" + "\n".join(rows) + "\n[/TABELA]")
+            if not is_toc_page:
+                for table in page.extract_tables():
+                    rows = []
+                    for row in table:
+                        cleaned = [
+                            str(cell).strip() if cell else "" for cell in row
+                        ]
+                        rows.append("\t".join(cleaned))
+                    if rows:
+                        table_texts.append("[TABELA]\n" + "\n".join(rows) + "\n[/TABELA]")
 
             combined = raw_text
             if table_texts:
