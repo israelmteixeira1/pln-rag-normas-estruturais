@@ -31,12 +31,15 @@ engenharia estrutural (ABNT).
 
 REGRAS OBRIGATÓRIAS:
 1. Responda APENAS com base nos trechos normativos fornecidos abaixo.
-2. Cite as fontes ao longo da resposta usando o formato [NBRxxxx#seção], \
-por exemplo: [NBR6118#13.2.4].
-3. Se a informação solicitada NÃO estiver nos trechos fornecidos, responda \
-exatamente: "Não encontrei informação suficiente nas normas consultadas \
-para responder esta pergunta."
-4. NÃO invente, extrapole ou use conhecimento externo às normas.
+2. Cite as fontes usando o formato [NBRxxxx, Seção Y.Y], \
+por exemplo: [NBR6118, Seção 13.2.4]. Use o doc_id e a seção indicados \
+no cabeçalho de cada trecho.
+3. Se a informação solicitada NÃO estiver nos trechos fornecidos, \
+escreva SOMENTE esta frase, sem nenhum texto antes ou depois: \
+"Não encontrei informação suficiente nas normas consultadas para responder \
+esta pergunta."
+4. NÃO invente, extrapole ou use conhecimento externo às normas. \
+NÃO misture uma resposta parcial com a frase de recusa — escolha um ou outro.
 5. Se a pergunta for sobre preços, orçamentos, marcas comerciais ou \
 qualquer tema NÃO normativo, recuse educadamente explicando que o sistema \
 consulta apenas normas técnicas ABNT.
@@ -60,12 +63,15 @@ um trecho fornecido.
 
 REGRAS OBRIGATÓRIAS:
 1. Responda APENAS com base nos trechos normativos fornecidos abaixo.
-2. Cite as fontes ao longo da resposta usando o formato [NBRxxxx#seção], \
-por exemplo: [NBR6118#13.2.4].
-3. Se a informação solicitada NÃO estiver nos trechos fornecidos, responda \
-exatamente: "Não encontrei informação suficiente nas normas consultadas \
-para responder esta pergunta."
-4. NÃO invente, extrapole ou use conhecimento externo às normas.
+2. Cite as fontes usando o formato [NBRxxxx, Seção Y.Y], \
+por exemplo: [NBR6118, Seção 13.2.4]. Use o doc_id e a seção indicados \
+no cabeçalho de cada trecho.
+3. Se a informação solicitada NÃO estiver nos trechos fornecidos, \
+escreva SOMENTE esta frase, sem nenhum texto antes ou depois: \
+"Não encontrei informação suficiente nas normas consultadas para responder \
+esta pergunta."
+4. NÃO invente, extrapole ou use conhecimento externo às normas. \
+NÃO misture uma resposta parcial com a frase de recusa — escolha um ou outro.
 5. Se a pergunta for sobre preços, orçamentos, marcas comerciais ou \
 qualquer tema NÃO normativo, recuse educadamente explicando que o sistema \
 consulta apenas normas técnicas ABNT.
@@ -104,9 +110,10 @@ def format_context(results: list[dict[str, Any]]) -> str:
     """
     parts: list[str] = []
     for r in results:
+        secao = r['secao']
+        secao_label = f"Seção {secao}" if secao != "intro" else "Introdução/Preâmbulo"
         header = (
-            f"[Fonte: {r['chunk_id']} | "
-            f"{r['doc_id']} — Seção {r['secao']} | "
+            f"[Fonte: {r['doc_id']} — {secao_label} | "
             f"Relevância: {r['score']:.3f}]"
         )
         parts.append(f"{header}\n{r['texto']}")
