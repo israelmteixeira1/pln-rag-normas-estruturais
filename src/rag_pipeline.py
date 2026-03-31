@@ -41,7 +41,7 @@ load_dotenv(_PROJECT_ROOT / ".env")
 # Configurações padrão
 # ---------------------------------------------------------------------------
 GEMINI_MODEL = "gemini-2.0-flash"
-GROQ_MODEL = "openai/gpt-oss-120b"
+GROQ_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 
 
 class RAGPipeline:

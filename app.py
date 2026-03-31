@@ -240,7 +240,7 @@ with st.sidebar:
         "---\n"
         "Modelo de embedding: `bert-base-portuguese-cased`\n\n"
         "Índice: FAISS (cosseno)\n\n"
-        "LLM: Groq — openai/gpt-oss-120b"
+        "LLM: Groq — llama-4-scout-17b"
     )
 
 # ---------------------------------------------------------------------------
