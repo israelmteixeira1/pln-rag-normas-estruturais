@@ -42,13 +42,16 @@ load_dotenv(_PROJECT_ROOT / ".env")
 # ---------------------------------------------------------------------------
 GEMINI_MODEL = "gemini-2.0-flash"
 GROQ_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
+NVIDIA_MODEL = "meta/llama-3.3-70b-instruct"
+NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1"
 
 
 class RAGPipeline:
     """
     Pipeline RAG completo para consulta de normas estruturais.
 
-    Suporta Google Gemini (provider='gemini') e Groq (provider='groq').
+    Suporta Google Gemini (provider='gemini'), Groq (provider='groq')
+    e NVIDIA NIM (provider='nvidia').
 
     Attributes
     ----------
@@ -61,7 +64,7 @@ class RAGPipeline:
     mode : str
         Modo padrão do pipeline: ``'baseline'`` ou ``'improved'``.
     provider : str
-        Provider LLM: ``'gemini'`` ou ``'groq'``.
+        Provider LLM: ``'groq'``, ``'nvidia'`` ou ``'gemini'``.
     """
 
     def __init__(
@@ -69,6 +72,7 @@ class RAGPipeline:
         api_key: str | None = None,
         gemini_model: str = GEMINI_MODEL,
         groq_model: str = GROQ_MODEL,
+        nvidia_model: str = NVIDIA_MODEL,
         mode: str = "baseline",
         index_dir: str | Path | None = None,
         provider: str = "groq",
@@ -80,17 +84,19 @@ class RAGPipeline:
         ----------
         api_key : str | None
             API key do provider. Se None, usa a variável de ambiente
-            correspondente (``GROQ_API_KEY`` ou ``GEMINI_API_KEY``).
+            correspondente (``GROQ_API_KEY``, ``NVIDIA_API_KEY`` ou ``GEMINI_API_KEY``).
         gemini_model : str
             Modelo Gemini (padrão: ``gemini-2.0-flash``).
         groq_model : str
-            Modelo Groq (padrão: ``openai/gpt-oss-120b``).
+            Modelo Groq (padrão: ``meta/llama-4-scout-17b-16e-instruct``).
+        nvidia_model : str
+            Modelo NVIDIA NIM (padrão: ``meta/llama-3.3-70b-instruct``).
         mode : str
             Modo padrão: ``'baseline'`` ou ``'improved'``.
         index_dir : str | Path | None
             Diretório do índice FAISS. Se None, usa o padrão (``index/``).
         provider : str
-            Provider LLM: ``'groq'`` (padrão) ou ``'gemini'``.
+            Provider LLM: ``'groq'`` (padrão), ``'nvidia'`` ou ``'gemini'``.
 
         Raises
         ------
@@ -112,6 +118,16 @@ class RAGPipeline:
             self.llm_client = Groq(api_key=key)
             self._model = groq_model
 
+        elif self.provider == "nvidia":
+            from openai import OpenAI
+            key = api_key or os.getenv("NVIDIA_API_KEY")
+            if not key:
+                raise ValueError(
+                    "NVIDIA_API_KEY não encontrada. Configure no .env ou passe api_key=."
+                )
+            self.llm_client = OpenAI(base_url=NVIDIA_BASE_URL, api_key=key)
+            self._model = nvidia_model
+
         elif self.provider == "gemini":
             from google import genai
             key = api_key or os.getenv("GEMINI_API_KEY")
@@ -123,7 +139,7 @@ class RAGPipeline:
             self._model = gemini_model
 
         else:
-            raise ValueError(f"Provider inválido: '{provider}'. Use 'groq' ou 'gemini'.")
+            raise ValueError(f"Provider inválido: '{provider}'. Use 'groq', 'nvidia' ou 'gemini'.")
 
         # --- Carrega índice FAISS + modelo de embedding ---
         print(f"[rag] Inicializando pipeline RAG (provider={self.provider}, modo={mode})...")
@@ -136,7 +152,7 @@ class RAGPipeline:
 
     def _call_llm(self, prompt: str) -> str:
         """Chama o LLM configurado e retorna o texto da resposta."""
-        if self.provider == "groq":
+        if self.provider in ("groq", "nvidia"):
             response = self.llm_client.chat.completions.create(
                 model=self._model,
                 messages=[{"role": "user", "content": prompt}],

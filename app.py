@@ -133,10 +133,10 @@ def _index_exists() -> bool:
 # Carregamento do pipeline (cacheado — carrega apenas uma vez)
 # ---------------------------------------------------------------------------
 @st.cache_resource(show_spinner=False)
-def load_pipeline():
-    """Carrega o pipeline RAG (índice FAISS + modelo de embedding + Groq)."""
+def load_pipeline(provider: str = "groq"):
+    """Carrega o pipeline RAG para o provider escolhido (cacheado por provider)."""
     from src.rag_pipeline import RAGPipeline
-    return RAGPipeline(provider="groq")
+    return RAGPipeline(provider=provider)
 
 
 @st.cache_resource(show_spinner=False)
@@ -187,6 +187,17 @@ if not _index_exists():
 # ---------------------------------------------------------------------------
 with st.sidebar:
     st.markdown("### ⚙️ Configurações")
+
+    provider = st.selectbox(
+        "Provider LLM",
+        options=["groq", "nvidia", "gemini"],
+        index=0,
+        help=(
+            "**Groq** (padrão): llama-4-scout-17b — rápido, 500K tokens/dia.\n\n"
+            "**NVIDIA NIM**: llama-3.3-70b — mais capaz, free tier disponível.\n\n"
+            "**Gemini**: gemini-2.0-flash — fallback Google."
+        ),
+    )
 
     mode = st.radio(
         "Modo do retriever",
@@ -247,7 +258,7 @@ with st.sidebar:
 # Carrega pipeline
 # ---------------------------------------------------------------------------
 with st.spinner("🔄 Carregando pipeline RAG (primeira vez pode demorar)..."):
-    pipeline = load_pipeline()
+    pipeline = load_pipeline(provider)
 
 # ---------------------------------------------------------------------------
 # Área principal — Entrada de pergunta
