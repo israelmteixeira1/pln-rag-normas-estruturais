@@ -9,6 +9,13 @@ Executar com:
 
 from __future__ import annotations
 
+import os
+# Configuração para evitar "segmentation fault" no macOS com Streamlit / Torch / FAISS
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+os.environ["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] = "YES"
+
 import streamlit as st
 from pathlib import Path
 
