@@ -13,6 +13,7 @@ Interface idêntica a indexer.retrieve() para compatibilidade com rag_pipeline.p
 from __future__ import annotations
 
 import re
+import unicodedata
 from typing import Any
 
 import numpy as np
@@ -22,9 +23,18 @@ from rank_bm25 import BM25Okapi
 _RRF_K = 60
 
 
+def _strip_accents(text: str) -> str:
+    """Remove diacríticos: 'variáveis' → 'variaveis', 'ação' → 'acao'."""
+    return unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
+
+
 def _tokenize(text: str) -> list[str]:
-    """Tokeniza texto: minúsculas, divide em tokens alfanuméricos."""
-    return [tok for tok in re.split(r"\W+", text.lower()) if tok]
+    """Tokeniza texto: minúsculas, remove diacríticos, divide em tokens alfanuméricos.
+
+    A remoção de diacríticos garante que queries sem acentos (ex.: 'tipico')
+    correspondam a termos acentuados no corpus (ex.: 'típico') no BM25.
+    """
+    return [tok for tok in re.split(r"\W+", _strip_accents(text.lower())) if tok]
 
 
 class SparseRetriever:

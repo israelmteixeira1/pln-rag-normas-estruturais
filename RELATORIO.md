@@ -1,80 +1,107 @@
-# Relatório — Chatbot RAG para Normas Estruturais ABNT
+# Relatório Chatbot RAG para Normas Estruturais ABNT
 
-**Grupo:** Eduardo Braga · Israel Magalhães · Marcelo Carvalho  
-**Disciplina:** Processamento de Linguagem Natural — IFG Pós-IA  
-**Trilha:** A — Recuperação Híbrida (Sparse + Dense)
+**Grupo:** Eduardo Braga, Israel Magalhães e Marcelo Carvalho
+**Disciplina:** Processamento de Linguagem Natural
+**Trilha escolhida:** A Recuperação Híbrida (Sparse + Dense)
 
 ---
 
 ## 1. Domínio e Corpus
 
-O sistema foi desenvolvido para auxiliar engenheiros, projetistas e estudantes na consulta a normas técnicas brasileiras de engenharia estrutural. O corpus é formado por documentos da ABNT — textos de alta precisão terminológica, com tabelas de valores e fórmulas específicas, onde uma resposta incorreta pode ter consequências práticas sérias.
+### Domínio
 
-Esse domínio justifica o uso de RAG em detrimento de um LLM direto por três razões principais: normas são revisadas periodicamente (a NBR 6120 teve sua segunda edição em 2019, substituindo a de 1980); os valores numéricos e coeficientes precisam ser exatos e rastreáveis; e qualquer citação deve referenciar a seção normativa de origem.
+O sistema foi desenvolvido para auxiliar engenheiros, projetistas e estudantes na consulta a **normas técnicas brasileiras de engenharia estrutural**. O corpus é fechado e composto por documentos normativos da ABNT, documentos de alta precisão terminológica e com valores numéricos críticos, onde respostas incorretas podem ter consequências práticas graves.
+
+O domínio justifica o uso de RAG em detrimento de um LLM direto: normas são atualizadas periodicamente, contêm tabelas e fórmulas específicas, e exigem rastreabilidade das fontes (citações normativas).
 
 ### Corpus
 
-| Norma | Título | Edição | Seções |
-|---|---|---|---|
-| **NBR 6120** | Cargas para o cálculo de estruturas de edificações | 2019 (2ª edição) | 124 |
-| **NBR 6123** | Forças devidas ao vento em edificações | 2023 | 166 |
+| Norma        | Título                                             | Edição           | Seções |
+| ------------ | -------------------------------------------------- | ---------------- | ------ |
+| **NBR 6120** | Cargas para o cálculo de estruturas de edificações | 2019 (2ª edição) | 124    |
+| **NBR 6123** | Forças devidas ao vento em edificações             | 2023             | 166    |
 
 **Total:** 290 seções · ~626 mil caracteres
 
-Juntas, as duas normas cobrem as principais ações externas no dimensionamento estrutural brasileiro: cargas permanentes, cargas acidentais de uso e forças de vento. A NBR 6118 (estruturas de concreto) foi inicialmente cogitada mas excluída porque o PDF disponível apresenta encoding corrompido em partes significativas, o que comprometeria a qualidade dos chunks gerados.
+**Metadados por documento:**
+
+| Campo    | Descrição                |
+| -------- | ------------------------ |
+| `doc_id` | `NBR6120` ou `NBR6123`   |
+| `titulo` | Título completo da norma |
+| `fonte`  | `ABNT`                   |
+| `edicao` | Edição/ano da norma      |
+
+**Justificativa da escolha:** A NBR 6120 cobre cargas permanentes e acidentais em edificações, enquanto a NBR 6123 cobre forças de vento. Juntas, formam a base das ações externas consideradas no dimensionamento estrutural brasileiro, domínio de alta relevância prática.
+
+A NBR 6118 (projeto de estruturas de concreto) foi inicialmente incluída mas removida do corpus: o PDF disponível apresenta encoding corrompido em partes significativas (fontes não-Unicode), o que geraria chunks de baixa qualidade e potencial desinformação.
 
 ---
 
-## 2. Chunking
+## 2. Chunking Decisões e Justificativas
 
-### Estratégia: uma seção normativa por chunk
+### Estratégia: 1 seção normativa = 1 chunk
 
-Cada chunk corresponde a uma seção semântica da norma — uma subseção, uma tabela ou um grupo de parágrafos relacionados. A divisão segue dois passos:
+Cada chunk corresponde a uma **seção semântica auto-contida** da norma (subseção, tabela ou grupo de parágrafos relacionados).
 
-1. **PDF → Markdown** via [Docling](https://github.com/DS4SD/docling), que preserva headings, tabelas e listas com fidelidade ao documento original.
-2. **Markdown → seções** via `scripts/split_sections_auto.py`, que divide o texto a cada heading de nível 2 (`##`).
+**Processo de geração:**
 
-Cada arquivo de seção recebe um frontmatter YAML com os metadados que depois identificam o chunk no índice:
+1. **PDF → Markdown** via [Docling](https://github.com/DS4SD/docling): preserva estrutura de headings, tabelas e listas
+2. **Markdown → seções** via `scripts/split_sections_auto.py`: divide nos headings `##` (nível 2), garantindo que cada chunk contenha um conceito ou conjunto de regras coeso
 
-| Campo | Valor típico |
-|---|---|
-| `chunk_id` | `NBR6120#91_62_cargas_variáveis` |
-| `doc_id` | `NBR6120` ou `NBR6123` |
-| `edicao` | `2019 (2ª edição)` ou `2023` |
-| `secao` | Título da seção (ex.: "6.2 Cargas variáveis") |
-| `summary` | Primeira sentença não-vazia do conteúdo |
+**Metadados por chunk:**
 
-### Tamanho dos chunks
+| Campo      | Descrição                                                        |
+| ---------- | ---------------------------------------------------------------- |
+| `chunk_id` | `NBR6120#07_tabela2_cargas_verticais` (doc_id + stem do arquivo) |
+| `doc_id`   | `NBR6120` ou `NBR6123`                                           |
+| `titulo`   | Título completo do documento                                     |
+| `fonte`    | `ABNT`                                                           |
+| `edicao`   | Edição da norma                                                  |
+| `secao`    | Título da seção (extraído do frontmatter YAML)                   |
+| `summary`  | Resumo gerado automaticamente da seção                           |
+| `texto`    | Conteúdo puro (para embedding)                                   |
+| `texto_md` | Conteúdo com frontmatter (para exibição)                         |
+| `n_chars`  | Tamanho em caracteres                                            |
 
-| | NBR 6120 | NBR 6123 |
-|---|---|---|
-| Mínimo | ~130 caracteres | ~6 caracteres |
-| Máximo | ~40.000 caracteres | ~65.000 caracteres |
-| Mediana | ~500 caracteres | ~500 caracteres |
+**Tamanho dos chunks:**
 
-### Decisões de projeto
+| Estatística | NBR6120      | NBR6123       |
+| ----------- | ------------ | ------------- |
+| Mínimo      | ~130 chars   | ~6 chars      |
+| Máximo      | ~3.600 chars | ~65.000 chars |
+| Mediana     | ~500 chars   | ~500 chars    |
 
-**Tabelas extensas.** Tabelas muito longas (Tabela 1 de pesos específicos, Tabela 10 de cargas variáveis) ficam divididas em seções de continuação geradas automaticamente (`tabela_10_continuação`, `tabela_10_conclusão`). Isso as torna recuperáveis de forma independente sem diluir o conteúdo narrativo do chunk principal.
+Seções muito pequenas (< 20 chars, e.g., headings isolados como "3.1") são mantidas no índice mas raramente retornadas como top-k relevante, não prejudicam a qualidade do retrieval.
 
-**Sem overlap.** A estrutura hierárquica das normas já garante que cada seção seja uma unidade semântica completa. Overlap introduziria duplicatas no índice sem ganho de cobertura.
+**Decisões sobre tabelas:** Tabelas muito extensas (e.g., Tabela 1 de pesos específicos, Tabela 10 de cargas variáveis) são divididas em seções de continuação pelo auto-split (`tabela_10_continuação`, `tabela_10_conclusão`). Isso as torna retrievable de forma independente sem diluir o conteúdo narrativo do chunk principal.
 
-**Seções muito pequenas.** Headings isolados (e.g., "3.1") geram chunks com menos de 20 caracteres. Eles são mantidos no índice mas praticamente nunca aparecem entre os top-k resultados, por isso não prejudicam a qualidade do retrieval.
+**Overlap:** Nenhum. A estrutura normativa já é hierarquicamente organizada, seções são unidades semânticas completas que não requerem overlap para manter coerência.
 
 ---
 
-## 3. Pipeline RAG (Baseline)
+## 3. Baseline RAG
 
-### Retriever e índice
+### Retriever (denso)
 
-O retriever denso utiliza o modelo `neuralmind/bert-base-portuguese-cased` (BERTimbau, dimensão 768), pré-treinado em português e adequado ao vocabulário técnico da ABNT. A escolha elimina dependência de API externa para geração de embeddings e permite execução em CPU no Google Colab.
+**Modelo:** `neuralmind/bert-base-portuguese-cased` (BERTimbau, dim=768)
 
-O índice é um `FAISS IndexFlatIP` com vetores L2-normalizados, o que equivale a busca exata por similaridade de cosseno. Com 290 chunks, a busca exata é computacionalmente trivial. O parâmetro k é configurável em 3, 5 ou 10.
+- Pré-treinado em português, adequado ao vocabulário técnico da ABNT
+- Não requer GPU para inferência (CPU viável no Colab)
+- Sem dependência de API externa para embeddings
 
-### Prompt e grounding
+**Índice:** FAISS `IndexFlatIP` com vetores L2-normalizados
 
-O sistema usa dois templates de prompt, ambos em `src/prompts.py`:
+- Busca exata por cosseno (sem aproximação)
+- Com 179 chunks, busca exata é computacionalmente trivial
 
-**Modo baseline** — instrução direta:
+**Configuração:** k = 3, 5 ou 10 (configurável na interface Gradio)
+
+### Prompt e Grounding
+
+O sistema utiliza dois templates de prompt (`src/prompts.py`):
+
+**Baseline:**
 
 ```
 REGRAS OBRIGATÓRIAS:
@@ -85,57 +112,81 @@ REGRAS OBRIGATÓRIAS:
 4. NÃO invente, extrapole ou use conhecimento externo às normas.
 ```
 
-**Modo melhorado** — adiciona chain-of-thought explícito (identificar → verificar → cruzar referências → confirmar suporte) e formato estruturado de saída (resposta objetiva → detalhamento → lista de referências).
+**Melhorado (modo `improved`):** Adiciona chain-of-thought (identificar → verificar → cruzar referências → confirmar suporte) e formato estruturado de resposta (resposta objetiva → detalhamento → lista de referências).
 
-### Citações e recusa
+### Citações
 
-Cada resposta inclui referências no formato `[NBR6120, Seção 6.2]`. A interface Gradio exibe os trechos recuperados com o `chunk_id`, o score de relevância e o texto completo, permitindo verificar a cadeia de evidências.
+Cada resposta inclui referências no formato `[NBR6120, Seção 2.2.1]`. A interface Gradio mostra os trechos recuperados com chunk_id, score de relevância e texto completo.
 
-A recusa é ativada quando nenhum trecho recuperado suporta a resposta, ou quando a pergunta é sobre tema fora do corpus (preços, marcas, recomendações de projeto não normativas). A frase canônica é: *"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta."*
+### Recusa adequada
 
-**LLM de geração:** Groq (`llama-3.3-70b-versatile`), com fallback para Google Gemini ou NVIDIA NIM.
+O prompt instrui o LLM a recusar com frase canônica quando:
+
+- A informação não está nos trechos recuperados
+- A pergunta é sobre tema não normativo (preços, marcas comerciais, etc.)
+
+### LLM de geração
+
+Provider padrão: **Groq** (llama-3.3-70b-versatile). Fallback: Google Gemini ou NVIDIA NIM (OpenAI-compatible).
 
 ---
 
-## 4. Trilha A — Recuperação Híbrida
+## 4. Trilha A Recuperação Híbrida
 
 ### Motivação
 
-O retriever denso captura relações semânticas bem, mas pode falhar quando a consulta usa termos muito específicos ausentes do pré-treino: valores numéricos (`3 kN/m²`), referências a parágrafos (`§ 6.3`) ou nomes de materiais (`granito`, `concreto armado`). O BM25, por outro lado, lida bem com termos exatos mas é cego a sinônimos e paráfrases. A recuperação híbrida combina as vantagens dos dois.
+O retriever denso (BERTimbau) captura semântica mas pode falhar em termos muito específicos não vistos no pré-treino: valores numéricos (`kN/m²`), nomes de seções (`§ 2.2.1.6`), ou termos técnicos raros. O BM25 captura termos exatos mas ignora sinônimos e paráfrases. A fusão híbrida combina as vantagens de ambos.
 
 ### Implementação
 
-O módulo `src/hybrid_search.py` implementa dois retrievers adicionais ao baseline:
+**`src/hybrid_search.py`** dois retrievers:
 
-**SparseRetriever (BM25Okapi):** tokenização por regex alfanumérico em lowercase (sem stemming), o que preserva números e unidades (`kN`, `m²`, `1,5`) como tokens relevantes.
+**SparseRetriever (BM25):**
 
-**HybridRetriever (BM25 + FAISS + RRF):** cada retriever contribui com `min(k×3, n_chunks)` candidatos, que são fundidos via *Reciprocal Rank Fusion*:
+- Tokenizador: regex alfanumérico, lowercase, sem stemming
+- Modelo: `BM25Okapi` (`rank-bm25`)
+- Score: TF-IDF com normalização pelo comprimento do documento
 
-$$\text{score}(c) = \sum_{\text{retriever}} \frac{1}{60 + \text{rank}(c)}$$
+**HybridRetriever (BM25 + FAISS + RRF):**
 
-A constante 60 é o valor padrão da literatura de RRF. Após a fusão, os chunks são deduplicados por `chunk_id` e os top-k são retornados.
+- Recupera `min(k×3, n_chunks)` candidatos de cada retriever
+- Funde via **Reciprocal Rank Fusion**: `score(chunk) = Σ 1 / (60 + rank)`
+- Deduplica por `chunk_id` antes da fusão (cada chunk conta uma vez por retriever)
+- Parâmetro `k_RRF = 60` (valor padrão da literatura)
 
-| Parâmetro | Valor | Justificativa |
-|---|---|---|
-| k_RRF | 60 | Constante padrão — equilibra retrievers com distribuições de ranking distintas |
-| Candidatos por retriever | k × 3 | Amplia o pool antes da fusão para reduzir falsos negativos |
-| Tokenização | regex `\W+` | Preserva unidades técnicas como tokens individuais |
+### Parâmetros
+
+| Parâmetro                | Valor       | Justificativa                                                                      |
+| ------------------------ | ----------- | ---------------------------------------------------------------------------------- |
+| k_RRF                    | 60          | Constante padrão RRF, equilibra contribuições de retrievers com rankings distintos |
+| Candidatos por retriever | k×3         | Amplia o pool antes da fusão, reduzindo o risco de perder o chunk correto          |
+| Tokenização              | regex `\W+` | Preserva números e unidades (`kN`, `m²`, `1,5`) como tokens relevantes             |
+
+### Avaliação Recall@k comparativo
+
+_Os valores abaixo serão preenchidos após execução do notebook (Seção 8)._
+
+| k   | Dense (baseline) | Sparse (BM25) | Hybrid (RRF) |
+| --- | ---------------- | ------------- | ------------ |
+| 3   | —                | —             | —            |
+| 5   | —                | —             | —            |
+| 10  | —                | —             | —            |
 
 ### Análise de trade-offs
 
-**Dense** se destaca em consultas semânticas: "peso próprio da estrutura" recupera a seção de ações permanentes mesmo sem sobreposição lexical exata.
+**Dense** se destaca em perguntas paráfrasticas (ex.: "peso próprio da estrutura" → recupera seção de "carga permanente" sem overlap léxico exato).
 
-**Sparse** se destaca quando a consulta contém termos muito específicos: valores numéricos exatos (`25 kN/m³`), referências de seção (`§ 6.12`) ou nomes de materiais.
+**Sparse** se destaca em perguntas com termos muito específicos: valores numéricos (`3 kN/m²`), referências a parágrafos (`§ 2.2.1.6`), nomes de materiais (`granito`, `concreto armado`).
 
-**Hybrid** tende a igualar ou superar ambos, especialmente em perguntas que exigem cruzar uma seção narrativa com uma tabela — casos onde os dois retrievers recuperam chunks complementares.
+**Hybrid** tende a igualar ou superar os dois modos isolados, especialmente para perguntas multi_trecho que exigem cruzar uma seção narrativa com uma tabela.
 
 **Latência:**
 
-| Modo | Retrieval típico | Gargalo |
-|---|---|---|
-| Sparse (BM25) | < 1 ms | — |
-| Dense (FAISS) | 5–20 ms | Encoding da query pelo BERTimbau |
-| Hybrid (RRF) | 5–20 ms | Dominado pelo encoding dense |
+| Modo   | Retrieval típico | Gargalo                       |
+| ------ | ---------------- | ----------------------------- |
+| Sparse | < 1 ms           | —                             |
+| Dense  | 5–20 ms          | Encoding da query (BERTimbau) |
+| Hybrid | 5–20 ms          | Dominado pelo encoding Dense  |
 
 ---
 
@@ -143,99 +194,40 @@ A constante 60 é o valor padrão da literatura de RRF. Após a fusão, os chunk
 
 ### 5.1 Golden Set
 
-O golden set contém 21 perguntas que cobrem os dois documentos do corpus:
+21 perguntas cobrindo os dois documentos do corpus:
 
-| Categoria | Qtd. | Descrição |
-|---|---|---|
-| `factual_direta` | 17 | Resposta direta em uma única seção |
-| `multi_trecho` | 3 | Requer combinar 2 ou mais seções |
-| `fora_do_corpus` | 1 | Testa recusa (pergunta sobre preço de concreto) |
+| Categoria        | Quantidade | Descrição                                       |
+| ---------------- | ---------- | ----------------------------------------------- |
+| `factual_direta` | 17         | Pergunta com resposta direta em uma seção       |
+| `multi_trecho`   | 3          | Requer combinar 2–4 seções para responder       |
+| `fora_do_corpus` | 1          | Testa recusa (pergunta sobre preço de concreto) |
 
-As 20 perguntas com evidência definida são usadas no cálculo de Recall@k. A pergunta fora do corpus é excluída dessa métrica e avaliada apenas pela rubrica qualitativa (critério de recusa).
+**Distribuição por norma:**
 
-### 5.2 Recall@k — Comparativo por modo de retrieval
+- NBR 6120: 10 perguntas (cargas permanentes, acidentais, tabelas de pesos)
+- NBR 6123: 10 perguntas (velocidade do vento, fatores S1/S2/S3, pressão dinâmica, análise dinâmica)
 
-> **Marcelo:** preencha com os valores impressos pela célula 8.2 do notebook
-> (`print_comparative_report(comp_results)`). Use o formato `0,XX` (ex.: `0,75`).
+### 5.2 Recall@k
 
-| k | Dense (baseline) | Sparse (BM25) | Hybrid (RRF) |
-|---|---|---|---|
-| 3 | | | |
-| 5 | | | |
-| 10 | | | |
-
-*(20 perguntas avaliáveis — pergunta fora do corpus excluída)*
-
-**Destaque:** *(após preencher a tabela, descreva aqui em 2–3 linhas em qual k o híbrido mais ganhou sobre o baseline e se houve caso em que o sparse superou o dense)*
+_Preencher com resultados após execução da Seção 8 do notebook._
 
 ### 5.3 Rubrica Qualitativa
 
-> **Marcelo:** para cada pergunta abaixo, execute a consulta no chatbot (modo dense, k=5)
-> e preencha os scores conforme a escala. Para a pergunta #21, o único critério relevante é
-> **Recusa** — os demais ficam N/A.
->
-> **Escala:**
-> - **Groundedness** — 0 = resposta não suportada pelos trechos; 1 = parcialmente suportada; 2 = totalmente suportada pelos trechos recuperados
-> - **Correção** — 0 = incorreta conforme a norma; 1 = parcialmente correta; 2 = correta
-> - **Citações** — 0 = ausentes ou erradas; 1 = presentes mas incompletas; 2 = adequadas e precisas
-> - **Alucinação** — 0 = inventou algo fora do corpus; 1 = não inventou
-> - **Recusa** — 0 = deveria recusar e não recusou; 1 = recusou corretamente; N/A = pergunta tem resposta no corpus
+_Avaliação manual de 15+ respostas geradas pelo pipeline (modo dense, k=5)._
 
-| # | Pergunta | G | C | Cit | Al | R |
-|---|---|:---:|:---:|:---:|:---:|:---:|
-| 1 | Qual o valor típico de carga acidental para um pavimento de escritório? | | | | | N/A |
-| 2 | Qual o valor de carga acidental para uma garagem de veículos leves? | | | | | N/A |
-| 3 | O peso próprio da estrutura deve ser considerado como que tipo de carga? | | | | | N/A |
-| 4 | Como tratar paredes divisórias cuja posição não é definida no projeto? | | | | | N/A |
-| 5 | Qual o peso específico do concreto armado? | | | | | N/A |
-| 6 | Qual a carga que deve ser considerada ao longo de parapeitos e balcões? | | | | | N/A |
-| 7 | Quais critérios determinam a categoria de projeto para garagens e áreas de circulação de veículos? | | | | | N/A |
-| 8 | Qual a carga variável mínima a considerar em coberturas com acesso apenas para manutenção? | | | | | N/A |
-| 9 | Quando é permitido reduzir as cargas acidentais em um edifício? | | | | | N/A |
-| 10 | Qual a redução percentual de cargas acidentais quando há 6 ou mais pisos? | | | | | N/A |
-| 11 | Como é definida a velocidade básica do vento V₀ pela NBR 6123? | | | | | N/A |
-| 12 | O que é a pressão dinâmica do vento e como é calculada? | | | | | N/A |
-| 13 | Quais são os três fatores que multiplicam V₀ para obter a velocidade característica Vk? | | | | | N/A |
-| 14 | O que considera o fator topográfico S1 no cálculo do vento? | | | | | N/A |
-| 15 | O que considera o fator S2 no cálculo da velocidade do vento? | | | | | N/A |
-| 16 | Para uma residência normal, qual o valor mínimo do fator estatístico S3? | | | | | N/A |
-| 17 | O que são sobrepressão e sucção no contexto dos coeficientes de pressão do vento? | | | | | N/A |
-| 18 | Como é considerada a pressão interna do vento em edificações com aberturas? | | | | | N/A |
-| 19 | Em que situações a NBR 6123 indica o uso de ensaios em túnel de vento? | | | | | N/A |
-| 20 | Quando estruturas altas e esbeltas precisam considerar análise dinâmica além da análise estática? | | | | | N/A |
-| 21 | Como calcular o preço do m³ de concreto para uma obra em Brasília? | N/A | N/A | N/A | N/A | |
+A rubrica foi aplicada por **Marcelo Carvalho** (engenheiro civil), garantindo que o critério **Correção** seja avaliado com expertise no domínio normativo.
 
-*(G = Groundedness · C = Correção · Cit = Citações · Al = Alucinação · R = Recusa)*
+**Critérios:**
 
-**Exemplos de respostas avaliadas**
+| Critério     | Escala                                       |
+| ------------ | -------------------------------------------- |
+| Groundedness | 0–2 (não suportada → totalmente suportada)   |
+| Correção     | 0–2 (incorreta → correta conforme as normas) |
+| Citações     | 0–2 (ausentes/erradas → adequadas)           |
+| Alucinação   | 0=sim / 1=não                                |
+| Recusa       | 0=falhou / 1=correta / N/A                   |
 
-> **Marcelo:** escolha 2 ou 3 respostas representativas (uma boa, uma com limitação, e
-> a de recusa #21) e transcreva abaixo o texto gerado pelo chatbot com seus comentários.
-> Isso demonstra a aplicação concreta da rubrica.
-
----
-
-**Exemplo 1 — pergunta #___ ("___________________________")**
-
-> *[cole aqui a resposta gerada pelo chatbot]*
-
-Avaliação: *(comente brevemente por que deu os scores que deu)*
-
----
-
-**Exemplo 2 — pergunta #___ ("___________________________")**
-
-> *[cole aqui a resposta gerada pelo chatbot]*
-
-Avaliação: *(comente brevemente)*
-
----
-
-**Exemplo 3 — pergunta #21 (recusa)**
-
-> *[cole aqui a resposta gerada pelo chatbot]*
-
-Avaliação: *(o chatbot recusou corretamente? A frase usada foi adequada?)*
+_Tabela de scores: ver `data/eval/rubrica_respostas.json`_
 
 ---
 
@@ -243,18 +235,20 @@ Avaliação: *(o chatbot recusou corretamente? A frase usada foi adequada?)*
 
 ### Limitações
 
-**Corpus restrito.** O corpus cobre cargas permanentes, acidentais e forças de vento, mas deixa de fora normas essenciais para o projeto estrutural completo — NBR 6118 (concreto), NBR 7190 (madeira), NBR 8800 (aço). A NBR 6118 foi excluída por problemas de encoding no PDF disponível.
+**Corpus limitado:** O corpus cobre cargas permanentes, acidentais e forças de vento, mas deixa de fora normas importantes do projeto estrutural (NBR 6118 — concreto, NBR 7190 — madeira, NBR 8800 — aço). A NBR 6118 foi excluída por problemas de encoding no PDF disponível.
 
-**Seções muito longas.** As seções `6.2 Cargas variáveis` (NBR 6120) e algumas da NBR 6123 ultrapassam 20.000 caracteres — acima do limite prático de representação fiel por um único vetor de embedding (~512 tokens). Isso pode reduzir a precisão do retrieval denso nessas seções.
+**Chunking sem sobreposição:** Algumas respostas requerem informação que está no início de uma seção narrativa e no final de outra. Com overlap zero, o retriever pode não recuperar os dois chunks simultaneamente, mitigado pelo hybrid retriever (k×3 candidatos).
 
-**Fórmulas não decodificadas.** O Docling converte equações matemáticas para `<!-- formula-not-decoded -->` quando não consegue renderizá-las, afetando seções da NBR 6123 com equações de pressão dinâmica e fatores S1/S2.
+**Seções muito grandes:** A seção `6.2 Cargas variáveis` da NBR 6120 (nova edição 2019) e algumas seções da NBR 6123 têm > 20.000 chars, acima do que modelos de embedding conseguem representar fielmente em um único vetor (limite típico: ~512 tokens). Em versões futuras, seria recomendável sub-dividir essas seções.
 
-**Dependência de API externa.** A geração de respostas depende de APIs de LLM (Groq/Gemini). Para uso totalmente local e offline, seria necessário integrar um modelo como `llama.cpp` ou Ollama.
+**Formulas não decodificadas:** O Docling converte fórmulas matemáticas para `<!-- formula-not-decoded -->` quando não consegue renderizá-las. Isso afeta algumas seções da NBR 6123 que contêm equações.
+
+**Dependência de API externa:** A geração de respostas depende de APIs de LLM (Groq/Gemini). Para uso totalmente local, seria necessário integrar um modelo como `llama.cpp` ou `Ollama`.
 
 ### Próximos Passos
 
-1. **Incluir NBR 6118** quando um PDF com encoding correto estiver disponível.
-2. **Subdividir seções longas** (> 2.000 caracteres) para melhorar a qualidade dos embeddings.
-3. **Reranking** (Trilha B) como camada adicional sobre o retriever híbrido.
-4. **Avaliação com RAGAS** para automatizar parte da rubrica qualitativa.
-5. **Interface standalone** (FastAPI ou Streamlit) desacoplada do notebook Jupyter.
+1. **Incluir NBR 6118** quando um PDF com encoding correto estiver disponível
+2. **Sub-dividir seções longas** (> 2.000 chars) para melhorar qualidade dos embeddings
+3. **Reranking** (Trilha B) como camada adicional sobre o hybrid retriever
+4. **Avaliação com RAGAS** para automatizar parte da rubrica qualitativa
+5. **Interface standalone** (Streamlit ou FastAPI) desacoplada do notebook Jupyter
