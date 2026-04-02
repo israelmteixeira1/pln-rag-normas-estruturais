@@ -16,11 +16,22 @@ import re
 import unicodedata
 from typing import Any
 
+import nltk
 import numpy as np
+from nltk.stem import RSLPStemmer
 from rank_bm25 import BM25Okapi
+
+# --- Download automático do recurso RSLP (stemmer PT-BR) ---
+try:
+    nltk.data.find("stemmers/rslp")
+except LookupError:
+    nltk.download("rslp", quiet=True)
 
 # RRF constant (standard value)
 _RRF_K = 60
+
+# Singleton do stemmer PT-BR (RSLPStemmer é leve e thread-safe para leitura)
+_stemmer = RSLPStemmer()
 
 
 def _strip_accents(text: str) -> str:
@@ -29,12 +40,20 @@ def _strip_accents(text: str) -> str:
 
 
 def _tokenize(text: str) -> list[str]:
-    """Tokeniza texto: minúsculas, remove diacríticos, divide em tokens alfanuméricos.
+    """Tokeniza texto: minúsculas, remove diacríticos, aplica stemming PT-BR.
 
-    A remoção de diacríticos garante que queries sem acentos (ex.: 'tipico')
-    correspondam a termos acentuados no corpus (ex.: 'típico') no BM25.
+    Pipeline:
+        1. Lowercasing
+        2. Remoção de diacríticos ('típico' → 'tipico')
+        3. Split em tokens alfanuméricos
+        4. Stemming RSLP ('escritorios' → 'escritori', 'variaveis' → 'variavel')
+
+    O stemming garante que plurais e flexões da query correspondam
+    às formas do corpus no BM25 (ex.: 'escritórios' ↔ 'escritório').
     """
-    return [tok for tok in re.split(r"\W+", _strip_accents(text.lower())) if tok]
+    tokens = [tok for tok in re.split(r"\W+", _strip_accents(text.lower())) if tok]
+    return [_stemmer.stem(tok) for tok in tokens]
+
 
 
 class SparseRetriever:
