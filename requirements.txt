@@ -19,6 +19,8 @@ faiss-cpu==1.9.0               # wheels pré-compilados disponíveis a partir de
 
 # --- Buscas Híbridas (BM25 + Embedding) ---
 rank-bm25>=0.2.2                # BM25 para busca léxica (hybrid search)
+nltk>=3.8.0                     # RSLPStemmer para stemming em PT-BR (BM25)
+Unidecode>=1.3.0                # normalização de acentos para tokenização léxica
 
 # --- Utilitários ---
 numpy>=1.26.0                  # faiss >= 1.9 é compatível com NumPy 2.x
