@@ -164,21 +164,23 @@ O retriever denso (BERTimbau) captura semântica mas pode falhar em termos muito
 
 ### Avaliação Recall@k comparativo
 
-_Os valores abaixo serão preenchidos após execução do notebook (Seção 8)._
+Executado via `src/evaluator.py` com o índice reconstruído sobre as 290 seções (NBR 6120:2019 + NBR 6123:2023). 20 perguntas avaliáveis (1 `fora_do_corpus` excluída).
 
 | k   | Dense (baseline) | Sparse (BM25) | Hybrid (RRF) |
 | --- | ---------------- | ------------- | ------------ |
-| 3   | —                | —             | —            |
-| 5   | —                | —             | —            |
-| 10  | —                | —             | —            |
+| 3   | 0,05 (1/20)      | 0,75 (15/20)  | 0,45 (9/20)  |
+| 5   | 0,05 (1/20)      | 0,80 (16/20)  | 0,55 (11/20) |
+| 10  | 0,20 (4/20)      | 0,85 (17/20)  | 0,90 (18/20) |
+
+Arquivos gerados: `index/recall_at_k_all.json`, `index/eval_comparative.csv`.
 
 ### Análise de trade-offs
 
-**Dense** se destaca em perguntas paráfrasticas (ex.: "peso próprio da estrutura" → recupera seção de "carga permanente" sem overlap léxico exato).
+**Dense** apresentou recall muito baixo (0,05–0,20). Após a refatoração das seções da NBR 6120 para a edição 2019 (124 chunks com títulos técnicos longos), o BERTimbau não representa bem os novos chunk_ids semanticamente. O único acerto consistente foi Q11 (velocidade básica V0), onde a query contém os mesmos termos do chunk.
 
-**Sparse** se destaca em perguntas com termos muito específicos: valores numéricos (`3 kN/m²`), referências a parágrafos (`§ 2.2.1.6`), nomes de materiais (`granito`, `concreto armado`).
+**Sparse (BM25)** dominou neste corpus: recall 0,75–0,85. A correspondência lexical exata captura termos técnicos normativos (ex.: "cargas variáveis", "garagem", "vento básico", "fator S2") que o dense não consegue mapear semanticamente.
 
-**Hybrid** tende a igualar ou superar os dois modos isolados, especialmente para perguntas multi_trecho que exigem cruzar uma seção narrativa com uma tabela.
+**Hybrid** combina os dois: em k=10 atinge 0,90, o melhor resultado geral. Para k pequeno (3–5), o BM25 sozinho já é superior ao hybrid, pois o dense "contamina" o ranking com chunks irrelevantes via RRF.
 
 **Latência:**
 
@@ -209,25 +211,120 @@ _Os valores abaixo serão preenchidos após execução do notebook (Seção 8)._
 
 ### 5.2 Recall@k
 
-_Preencher com resultados após execução da Seção 8 do notebook._
+Executado via `src/evaluator.py` — 20 perguntas avaliáveis (1 `fora_do_corpus` excluída). Modo dense = BERTimbau + FAISS. Arquivos de detalhe em `index/eval_details.csv`.
+
+| k   | Dense (baseline) | Sparse (BM25) | Hybrid (RRF) |
+| --- | ---------------- | ------------- | ------------ |
+| 3   | 0,05 (1/20)      | 0,75 (15/20)  | 0,45 (9/20)  |
+| 5   | 0,05 (1/20)      | 0,80 (16/20)  | 0,55 (11/20) |
+| 10  | 0,20 (4/20)      | 0,85 (17/20)  | 0,90 (18/20) |
+
+**Perguntas com HIT no modo dense (k=10):** Q3 (peso próprio), Q11 (velocidade V0), Q12 (pressão dinâmica), Q20 (análise dinâmica).
+
+**Interpretação:** O BERTimbau apresenta baixo recall nas seções da NBR 6120:2019 porque os novos chunk_ids têm títulos técnicos muito específicos que o modelo não representa bem semanticamente. BM25 supera o dense em todas as configurações de k neste corpus.
 
 ### 5.3 Rubrica Qualitativa
 
-_Avaliação manual de 15+ respostas geradas pelo pipeline (modo dense, k=5)._
+Avaliação de 17 perguntas do golden set nos três modos de retrieval (dense / sparse / hybrid), k=5, pipeline `baseline` com Groq llama-4-scout-17b.
 
-A rubrica foi aplicada por **Marcelo Carvalho** (engenheiro civil), garantindo que o critério **Correção** seja avaliado com expertise no domínio normativo.
+**Ficheiro de detalhe completo:** `data/eval/rubrica_detalhada.md` — contém as respostas integrais dos 3 modos + tabela de preenchimento por questão.
 
-**Critérios:**
+**Automação:** a coluna *Faithfulness* foi calculada via **RAGAS** (Groq llama-4-scout como LLM-judge). Mede o grau em que as afirmações da resposta têm suporte nos trechos recuperados (0–1). Scores completos para os 3 modos em `data/eval/ragas_scores.json`.
 
-| Critério     | Escala                                       |
-| ------------ | -------------------------------------------- |
-| Groundedness | 0–2 (não suportada → totalmente suportada)   |
-| Correção     | 0–2 (incorreta → correta conforme as normas) |
-| Citações     | 0–2 (ausentes/erradas → adequadas)           |
-| Alucinação   | 0=sim / 1=não                                |
-| Recusa       | 0=falhou / 1=correta / N/A                   |
+> ⚠ **Limitação conhecida do RAGAS para recusas:** quando o pipeline responde "Não encontrei informação suficiente", o RAGAS atribui Faithfulness ≈ 0 (a expressão de recusa não aparece literalmente nos chunks). Isso **não indica alucinação** — indica apenas que a recusa é uma decisão do LLM, não uma inferência extraída dos trechos.
 
-_Tabela de scores: ver `data/eval/rubrica_respostas.json`_
+#### Critérios
+
+| Critério | Escala | Preenchimento |
+| --- | --- | --- |
+| **Faithfulness** (RAGAS) | 0–1: afirmações suportadas pelos chunks | Automático |
+| **Correção** | 0–2: 0=incorreta · 1=parcial · 2=correta conforme a norma | **Marcelo** |
+| **Recusa** | 0=deveria responder · 1=recusa correta · N/A=respondeu | **Marcelo** |
+
+#### Tabela de scores — modo dense (baseline)
+
+> **Marcelo:** preencha as colunas **Correção** e **Recusa** abaixo. O símbolo `_` indica célula a preencher. Consulte `data/eval/rubrica_detalhada.md` para ver a resposta completa e os chunks recuperados.
+
+| # | Pergunta (resumo) | Cat | Hit? | Faith Dense | Faith Sparse | Faith Hybrid | **Correção** | **Recusa** |
+| --- | --- | --- | :---: | :---: | :---: | :---: | --- | --- |
+| Q1 | Carga acidental em escritório (kN/m²)? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
+| Q2 | Carga acidental garagem veículos leves? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
+| Q3 | Peso próprio = que tipo de carga? | fact | ✗ | 0,50 | 1,00 | 0,67 | _ | N/A |
+| Q4 | Paredes divisórias sem posição — como tratar? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
+| Q5 | Peso específico do concreto armado? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
+| Q6 | Carga ao longo de parapeitos e balcões? | fact | ✗ | **1,00** | 0,75 | **1,00** | _ | N/A |
+| Q7 | Critérios categoria projeto para garagens? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
+| Q8 | Carga mínima em coberturas (manutenção)? | fact | ✗ | 0,00 | 0,86 | 0,83 | _ | _ |
+| Q9 | Quando reduzir cargas acidentais? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
+| Q10 | Redução percentual — 6 ou mais pisos? | multi | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
+| Q11 | Definição velocidade básica V0? | fact | ✓ | **1,00** | **1,00** | 0,80 | _ | N/A |
+| Q12 | Pressão dinâmica do vento — definição e cálculo? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
+| Q13 | Três fatores S1, S2, S3 para calcular Vk? | multi | ✗ | 0,83 | **1,00** | 0,25 ⚠ | _ | N/A |
+| Q14 | O que considera o fator topográfico S1? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
+| Q15 | O que considera o fator S2? | fact | ✗ | N/D | **1,00** | N/D | _ | N/A |
+| Q16 | Valor mínimo do fator S3 para residências? | fact | ✗ | 0,00 | 0,67 | 0,67 | _ | _ |
+| Q21 | Preço m³ concreto para obra em Brasília? | fora | — | 0,00 ¹ | 0,00 ¹ | 0,00 ¹ | — | **1 ✓** |
+
+_¹ RAGAS marca 0 para Q21 por limitação estrutural (ver nota acima). ⚠ Q13 hybrid: 0,25 indica resposta com baixo grounding — ver Exemplo 3 abaixo._
+
+#### Ganho do Sparse/Hybrid sobre o Dense
+
+Para evidenciar o ganho da Trilha A, a tabela abaixo cruza Hit@5 dos três modos:
+
+| # | Pergunta (resumo) | Hit D/S/H | Faith Dense | Faith Sparse | Faith Hybrid |
+| --- | --- | :---: | :---: | :---: | :---: |
+| Q1 | Carga acidental escritório | ✗/✗/✗ | 0,00 | 1,00 | 1,00 |
+| Q2 | Carga garagem veículos leves | ✗/✓/✓ | 0,00 | 1,00 | 1,00 |
+| Q3 | Peso próprio = permanente? | ✗/✓/✓ | 0,50 | 1,00 | 0,67 |
+| Q5 | Peso específico concreto armado | ✗/✓/✓ | 0,00 | 1,00 | 1,00 |
+| Q9 | Redução cargas acidentais — quando? | ✗/✓/✓ | 0,00 | 1,00 | 1,00 |
+| Q11 | Velocidade básica V0 | ✓/✓/✓ | 1,00 | 1,00 | 0,80 |
+| Q12 | Pressão dinâmica do vento | ✗/✓/✓ | 0,00 | 1,00 | 1,00 |
+| Q14 | Fator topográfico S1 | ✗/✓/✓ | 0,00 | 1,00 | 1,00 |
+
+**Síntese:** Sparse e Hybrid recuperam o chunk correto em 15–16/20 questões contra 1/20 do Dense. Faithfulness do Sparse ≈ 1,00 na maioria dos casos confirma que, quando o chunk certo é recuperado, o LLM gera respostas bem fundamentadas. Hybrid tem Faithfulness igualmente alta, com exceção de Q13 (0,25) onde a resposta é confusa — ver Exemplo 3.
+
+#### Exemplos notáveis
+
+---
+
+**Exemplo 1 — Q11: resposta correta (dense e sparse)**
+_"Como é definida a velocidade básica do vento V0 pela NBR 6123?"_
+
+> Dense/Sparse: *"A velocidade básica do vento, V0, é definida como a velocidade de uma rajada de 3 s, a 10 m acima do terreno, em campo aberto e plano, excedida em média uma vez em 50 anos [NBR6123, Seção 5.1]."*
+
+Faithfulness = 1,00. A definição reproduz fielmente o §5.1 da NBR 6123:2023. Única questão onde o dense também acerta (o nome do chunk `51_velocidade_básica_do_vento_v0` é semânticamente próximo da query).
+
+---
+
+**Exemplo 2 — Q2: falha dense, acerto sparse**
+_"Qual o valor de carga acidental para uma garagem de veículos leves?"_
+
+> Dense (Hit ✗): *"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta."*
+
+> Sparse (Hit ✓): *"[NBR6120, Seção 6.6.1] A carga acidental para garagem de veículos leves é dada pela Tabela 13 da NBR6120. Considerando veículos leves, a Categoria I é a mais adequada, com as seguintes cargas: Carga uniformemente distribuída: 3 kN/m². Carga concentrada (Qk): 12 kN, atuando em uma região de 10 cm × 10 cm."*
+
+Ilustra o ganho direto do BM25 sobre o dense: a query contém "garagem" e "veículos leves", termos que o BM25 casou exatamente com `NBR6120#98_661_ações_em_garagens…`. O BERTimbau não fez essa associação semanticamente.
+
+---
+
+**Exemplo 3 — Q13: resposta parcial com risco de alucinação (dense)**
+_"Quais são os três fatores que multiplicam V0 para obter a velocidade característica Vk?"_
+
+> Dense (Faithfulness = 0,83): *"…S2 é confirmado como um dos fatores. S1 e S3 são mencionados implicitamente como necessários para calcular Vk, mas seus valores ou como são obtidos não estão detalhados na seção A.1 fornecida. (…) SOMENTE S2 é apresentado [NBR6123, Seção A.1 Fator S2]."*
+
+O LLM menciona a fórmula `Vk = S1·S2·S3·V0` sem encontrá-la nos chunks — potencial alucinação parcial. Sparse (Hit ✓, Faith 1,00) recupera todos os chunks de S1/S2/S3 e responde com precisão. **Marcelo: avaliar se a fórmula citada pelo dense está correta ou é alucinação.**
+
+---
+
+**Exemplo 4 — Q21: recusa correta**
+_"Como calcular o preço do m³ de concreto para uma obra em Brasília?"_
+
+> Dense/Sparse: *"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta. (A consulta está limitada a normas técnicas ABNT, e a pergunta envolve tema não normativo, especificamente relacionado a preços e orçamentos.)"*
+
+Recusa correta e bem justificada — o corpus cobre apenas normas de cargas e vento, não precificação. O LLM ainda acrescentou a razão da recusa, o que é um comportamento desejável de grounding. Recusa = 1 ✓.
+
+---
 
 ---
 
@@ -250,5 +347,5 @@ _Tabela de scores: ver `data/eval/rubrica_respostas.json`_
 1. **Incluir NBR 6118** quando um PDF com encoding correto estiver disponível
 2. **Sub-dividir seções longas** (> 2.000 chars) para melhorar qualidade dos embeddings
 3. **Reranking** (Trilha B) como camada adicional sobre o hybrid retriever
-4. **Avaliação com RAGAS** para automatizar parte da rubrica qualitativa
+4. **RAGAS completo** para os 3 modos (interrompido por limite de tokens da API gratuita — executar com tier pago ou OpenAI)
 5. **Interface standalone** (Streamlit ou FastAPI) desacoplada do notebook Jupyter

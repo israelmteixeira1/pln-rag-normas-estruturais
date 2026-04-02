@@ -1,0 +1,587 @@
+[
+  {
+    "id": 1,
+    "pergunta": "Qual o valor típico de carga acidental para um pavimento de escritório?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#91_62_cargas_variáveis",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#83_52_peso_próprio_da_estrutura",
+        "score": 0.7557
+      },
+      {
+        "chunk_id": "NBR6120#59_peso_específico_aparente",
+        "score": 0.7289
+      },
+      {
+        "chunk_id": "NBR6123#116_92_velocidade_de_projeto_para_análise_dinâmica_na_direção_do",
+        "score": 0.7193
+      },
+      {
+        "chunk_id": "NBR6123#117_93_modelo_contínuo_simplificado",
+        "score": 0.7142
+      },
+      {
+        "chunk_id": "NBR6123#127_961_cálculo_da_amplitude_de_aceleração_máxima",
+        "score": 0.7132
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.112,
+      "generation_s": 0.818,
+      "total_s": 0.931
+    }
+  },
+  {
+    "id": 2,
+    "pergunta": "Qual o valor de carga acidental para uma garagem de veículos leves?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#98_661_ações_em_garagens_e_demais_áreas_de_circulação_de_veícul",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#63_tara",
+        "score": 0.7516
+      },
+      {
+        "chunk_id": "NBR6120#57_pbt",
+        "score": 0.732
+      },
+      {
+        "chunk_id": "NBR6120#29_ações_permanentes",
+        "score": 0.6789
+      },
+      {
+        "chunk_id": "NBR6120#121_c4_fadiga",
+        "score": 0.6788
+      },
+      {
+        "chunk_id": "NBR6120#83_52_peso_próprio_da_estrutura",
+        "score": 0.6732
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.04,
+      "generation_s": 0.361,
+      "total_s": 0.401
+    }
+  },
+  {
+    "id": 3,
+    "pergunta": "O peso próprio da estrutura deve ser considerado como que tipo de carga?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#29_ações_permanentes",
+    "answer": "De acordo com a norma [NBR6120, Seção 5.2], o peso próprio da estrutura é considerado como parte da ação permanente que corresponde ao peso exclusivamente da estrutura. Portanto, o peso próprio da estrutura deve ser considerado como uma ação permanente.\n\nMais especificamente, na [NBR6120, Seção peso próprio], é definido que \"peso próprio\" é \"parte da ação permanente que corresponde ao peso exclusivamente da estrutura\".",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#83_52_peso_próprio_da_estrutura",
+        "score": 0.7602
+      },
+      {
+        "chunk_id": "NBR6120#63_tara",
+        "score": 0.7342
+      },
+      {
+        "chunk_id": "NBR6120#59_peso_específico_aparente",
+        "score": 0.7303
+      },
+      {
+        "chunk_id": "NBR6120#57_pbt",
+        "score": 0.711
+      },
+      {
+        "chunk_id": "NBR6120#61_peso_próprio",
+        "score": 0.6964
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.053,
+      "generation_s": 0.584,
+      "total_s": 0.637
+    }
+  },
+  {
+    "id": 4,
+    "pergunta": "Como tratar paredes divisórias cuja posição não é definida no projeto?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#93_tabela_10_conclusão",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#10_ações_para_o_cálculo_de_estruturas_de_edificações",
+        "score": 0.7065
+      },
+      {
+        "chunk_id": "NBR6120#35_ações_variáveis_normais",
+        "score": 0.7052
+      },
+      {
+        "chunk_id": "NBR6123#97_723_forças_em_placas_localizadas_acima_ou_abaixo_da_cobertur",
+        "score": 0.689
+      },
+      {
+        "chunk_id": "NBR6123#77_624_coeficientes_de_pressão_externa_e_de_sustentação_para_cú",
+        "score": 0.6802
+      },
+      {
+        "chunk_id": "NBR6123#94_72_coberturas_isoladas_a_águas_planas",
+        "score": 0.6789
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.052,
+      "generation_s": 0.741,
+      "total_s": 0.792
+    }
+  },
+  {
+    "id": 5,
+    "pergunta": "Qual o peso específico do concreto armado?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#84_53_peso_específico_dos_materiais_de_construção",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#83_52_peso_próprio_da_estrutura",
+        "score": 0.7055
+      },
+      {
+        "chunk_id": "NBR6120#59_peso_específico_aparente",
+        "score": 0.6947
+      },
+      {
+        "chunk_id": "NBR6120#63_tara",
+        "score": 0.6589
+      },
+      {
+        "chunk_id": "NBR6120#10_ações_para_o_cálculo_de_estruturas_de_edificações",
+        "score": 0.6479
+      },
+      {
+        "chunk_id": "NBR6120#36_310_ângulo_de_atrito_interno",
+        "score": 0.645
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.055,
+      "generation_s": 0.803,
+      "total_s": 0.858
+    }
+  },
+  {
+    "id": 6,
+    "pergunta": "Qual a carga que deve ser considerada ao longo de parapeitos e balcões?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#94_63_forças_horizontais_variáveis",
+    "answer": "[NBR6120, Seção Tabela 10 (continuação)]\nDe acordo com a Tabela 10 (continuação), item j, nas bordas de balcões, varandas, sacadas e terraços com guarda-corpo, deve ser prevista uma carga variável de 2 kN/m, além do peso próprio do guarda-corpo.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#121_c4_fadiga",
+        "score": 0.7569
+      },
+      {
+        "chunk_id": "NBR6120#92_tabela_10_continuação",
+        "score": 0.7518
+      },
+      {
+        "chunk_id": "NBR6120#29_ações_permanentes",
+        "score": 0.7511
+      },
+      {
+        "chunk_id": "NBR6120#33_ações_variáveis_especiais",
+        "score": 0.7471
+      },
+      {
+        "chunk_id": "NBR6120#83_52_peso_próprio_da_estrutura",
+        "score": 0.7415
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.052,
+      "generation_s": 1.385,
+      "total_s": 1.437
+    }
+  },
+  {
+    "id": 7,
+    "pergunta": "Quais critérios determinam a categoria de projeto para garagens e áreas de circulação de veículos?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#98_661_ações_em_garagens_e_demais_áreas_de_circulação_de_veícul",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#39_sem_acesso_controlado",
+        "score": 0.7892
+      },
+      {
+        "chunk_id": "NBR6120#42_com_acesso_controlado",
+        "score": 0.7835
+      },
+      {
+        "chunk_id": "NBR6120#71_vias_particulares",
+        "score": 0.7793
+      },
+      {
+        "chunk_id": "NBR6120#31_ações_variáveis",
+        "score": 0.7541
+      },
+      {
+        "chunk_id": "NBR6123#77_624_coeficientes_de_pressão_externa_e_de_sustentação_para_cú",
+        "score": 0.7494
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.056,
+      "generation_s": 1.576,
+      "total_s": 1.632
+    }
+  },
+  {
+    "id": 8,
+    "pergunta": "Qual a carga variável mínima a considerar em coberturas com acesso apenas para manutenção?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#95_64_cargas_variáveis_em_coberturas",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#33_ações_variáveis_especiais",
+        "score": 0.7519
+      },
+      {
+        "chunk_id": "NBR6120#121_c4_fadiga",
+        "score": 0.7419
+      },
+      {
+        "chunk_id": "NBR6120#31_ações_variáveis",
+        "score": 0.7351
+      },
+      {
+        "chunk_id": "NBR6120#29_ações_permanentes",
+        "score": 0.731
+      },
+      {
+        "chunk_id": "NBR6120#35_ações_variáveis_normais",
+        "score": 0.7266
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.046,
+      "generation_s": 0.469,
+      "total_s": 0.515
+    }
+  },
+  {
+    "id": 9,
+    "pergunta": "Quando é permitido reduzir as cargas acidentais em um edifício?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#106_612_redução_de_cargas_variáveis",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6123#139_1112_simultaneidade_de_ações",
+        "score": 0.692
+      },
+      {
+        "chunk_id": "NBR6120#10_ações_para_o_cálculo_de_estruturas_de_edificações",
+        "score": 0.6919
+      },
+      {
+        "chunk_id": "NBR6123#94_72_coberturas_isoladas_a_águas_planas",
+        "score": 0.6917
+      },
+      {
+        "chunk_id": "NBR6123#90_643_pela_turbulência_da_esteira",
+        "score": 0.6887
+      },
+      {
+        "chunk_id": "NBR6120#44_barreiras_de_veículos",
+        "score": 0.6727
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.052,
+      "generation_s": 0.662,
+      "total_s": 0.714
+    }
+  },
+  {
+    "id": 10,
+    "pergunta": "Qual a redução percentual de cargas acidentais quando há 6 ou mais pisos?",
+    "categoria": "multi_trecho",
+    "evidencia_esperada": [
+      "NBR6120#106_612_redução_de_cargas_variáveis"
+    ],
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#121_c4_fadiga",
+        "score": 0.7528
+      },
+      {
+        "chunk_id": "NBR6123#139_1112_simultaneidade_de_ações",
+        "score": 0.7316
+      },
+      {
+        "chunk_id": "NBR6120#29_ações_permanentes",
+        "score": 0.7299
+      },
+      {
+        "chunk_id": "NBR6123#73_62_edificações_com_superfícies_curvas_ou_com_cantos_arredond",
+        "score": 0.7294
+      },
+      {
+        "chunk_id": "NBR6120#31_ações_variáveis",
+        "score": 0.7234
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.048,
+      "generation_s": 0.396,
+      "total_s": 0.445
+    }
+  },
+  {
+    "id": 11,
+    "pergunta": "Como é definida a velocidade básica do vento V0 pela NBR 6123?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#52_51_velocidade_básica_do_vento_v0",
+    "answer": "A velocidade básica do vento, V0, é definida como a velocidade de uma rajada de 3 s, a 10 m acima do terreno, em campo aberto e plano, excedida em média uma vez em 50 anos [NBR6123, Seção 5.1].",
+    "sources": [
+      {
+        "chunk_id": "NBR6123#116_92_velocidade_de_projeto_para_análise_dinâmica_na_direção_do",
+        "score": 0.7658
+      },
+      {
+        "chunk_id": "NBR6123#52_51_velocidade_básica_do_vento_v0",
+        "score": 0.746
+      },
+      {
+        "chunk_id": "NBR6123#127_961_cálculo_da_amplitude_de_aceleração_máxima",
+        "score": 0.7399
+      },
+      {
+        "chunk_id": "NBR6123#35_vento_básico",
+        "score": 0.7348
+      },
+      {
+        "chunk_id": "NBR6123#132_102_critério_para_verificação_do_efeito_de_desprendimento_de",
+        "score": 0.7333
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.036,
+      "generation_s": 1.347,
+      "total_s": 1.383
+    }
+  },
+  {
+    "id": 12,
+    "pergunta": "O que é a pressão dinâmica do vento e como é calculada?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#46_42_pressão_dinâmica",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#48_coeficiente_dinâmico",
+        "score": 0.7601
+      },
+      {
+        "chunk_id": "NBR6123#52_51_velocidade_básica_do_vento_v0",
+        "score": 0.7432
+      },
+      {
+        "chunk_id": "NBR6123#140_112_escolha_do_tipo_de_análise",
+        "score": 0.743
+      },
+      {
+        "chunk_id": "NBR6123#127_961_cálculo_da_amplitude_de_aceleração_máxima",
+        "score": 0.7327
+      },
+      {
+        "chunk_id": "NBR6123#116_92_velocidade_de_projeto_para_análise_dinâmica_na_direção_do",
+        "score": 0.7321
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.035,
+      "generation_s": 0.618,
+      "total_s": 0.653
+    }
+  },
+  {
+    "id": 13,
+    "pergunta": "Quais são os três fatores que multiplicam V0 para obter a velocidade característica Vk?",
+    "categoria": "multi_trecho",
+    "evidencia_esperada": [
+      "NBR6123#46_42_pressão_dinâmica",
+      "NBR6123#53_52_fator_topográfico_s1",
+      "NBR6123#54_53_rugosidade_do_terreno_dimensões_da_edificação_estrutura_o",
+      "NBR6123#58_54_fator_estatístico_s3"
+    ],
+    "answer": "[NBR6123, Seção A.1 Fator S 2]\n\nOs três fatores que multiplicam V0 para obter a velocidade característica Vk são S1, S2 e S3, embora S1 e S3 não estejam explicitamente listados na seção fornecida, a fórmula apresentada implica que Vk = S1 * S2 * S3 * V0 ou variações desta, porém apenas S2 é detalhado na seção.\n\nUma forma explícita de Vk é fornecida sem S1 e S3, mas com base em Vt,i(z):\n\nVk,i = Vt,i(z) = S2 * V0 \n\nPara ser preciso com a pergunta, o trecho de norma explicitou apenas S2 como fator. Portanto, com base na informação disponível:\n\n- S2 é confirmado como um dos fatores. \n- S1 e S3 são mencionados implicitamente como necessários para calcular Vk, mas seus valores ou como são obtidos não estão detalhados na seção A.1 fornecida.\n\nPortanto, baseado estritamente na pergunta e na informação fornecida:\n\nOs fatores citados, com base nas informações fornecidas são:\n\n- S2 \n\nImplicitamente, para Vk = S1 * S2 * S3 * V0 , os outros dois seriam:\n- S1 \n- S3 \n\nMas estritamente com base no trecho fornecido: \n\nSOMENTE S2 é apresentado [NBR6123, Seção A.1 Fator S 2].",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#48_coeficiente_dinâmico",
+        "score": 0.7996
+      },
+      {
+        "chunk_id": "NBR6123#124_944_combinação_das_contribuições_modais",
+        "score": 0.7809
+      },
+      {
+        "chunk_id": "NBR6123#132_102_critério_para_verificação_do_efeito_de_desprendimento_de",
+        "score": 0.764
+      },
+      {
+        "chunk_id": "NBR6123#121_941_definições",
+        "score": 0.7525
+      },
+      {
+        "chunk_id": "NBR6123#156_a1_fator_s_2",
+        "score": 0.7492
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.033,
+      "generation_s": 2.39,
+      "total_s": 2.423
+    }
+  },
+  {
+    "id": 14,
+    "pergunta": "O que considera o fator topográfico S1 no cálculo do vento?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#53_52_fator_topográfico_s1",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6123#44_4_procedimento_para_o_cálculo_das_forças_devidas_ao_vento",
+        "score": 0.7278
+      },
+      {
+        "chunk_id": "NBR6120#83_52_peso_próprio_da_estrutura",
+        "score": 0.7182
+      },
+      {
+        "chunk_id": "NBR6123#116_92_velocidade_de_projeto_para_análise_dinâmica_na_direção_do",
+        "score": 0.7158
+      },
+      {
+        "chunk_id": "NBR6123#52_51_velocidade_básica_do_vento_v0",
+        "score": 0.7149
+      },
+      {
+        "chunk_id": "NBR6123#132_102_critério_para_verificação_do_efeito_de_desprendimento_de",
+        "score": 0.7095
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.049,
+      "generation_s": 0.511,
+      "total_s": 0.56
+    }
+  },
+  {
+    "id": 15,
+    "pergunta": "O que considera o fator S2 no cálculo da velocidade do vento?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#54_53_rugosidade_do_terreno_dimensões_da_edificação_estrutura_o",
+    "answer": "[NBR6123, Seção 9.2] \nA velocidade de projeto $V_p$ corresponde à velocidade média sobre 10 min a 10 m de altura sobre o solo, em terreno de Categoria II, é calculada pela seguinte equação, que envolve o fator S2: \n\nNão encontrei a descrição explicita do fator $S_2$ nos trechos de norma fornecidos para uma resposta conclusiva. \nmas posso encontrar em outras partes da norma. \nMas, [NBR6123, Seção 10.2] cita que  $S_2$ é calculado para altura z da seção da edificação onde ocorre o desprendimento de vórtices, considerando o intervalo de tempo de 600 s, para o qual Fr é igual a 0,69.",
+    "sources": [
+      {
+        "chunk_id": "NBR6123#44_4_procedimento_para_o_cálculo_das_forças_devidas_ao_vento",
+        "score": 0.774
+      },
+      {
+        "chunk_id": "NBR6123#116_92_velocidade_de_projeto_para_análise_dinâmica_na_direção_do",
+        "score": 0.7508
+      },
+      {
+        "chunk_id": "NBR6123#52_51_velocidade_básica_do_vento_v0",
+        "score": 0.7495
+      },
+      {
+        "chunk_id": "NBR6123#132_102_critério_para_verificação_do_efeito_de_desprendimento_de",
+        "score": 0.7456
+      },
+      {
+        "chunk_id": "NBR6123#124_944_combinação_das_contribuições_modais",
+        "score": 0.7437
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.038,
+      "generation_s": 1.003,
+      "total_s": 1.041
+    }
+  },
+  {
+    "id": 16,
+    "pergunta": "Para uma residência normal, qual o valor mínimo do fator estatístico S3?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#58_54_fator_estatístico_s3",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#48_coeficiente_dinâmico",
+        "score": 0.7559
+      },
+      {
+        "chunk_id": "NBR6123#124_944_combinação_das_contribuições_modais",
+        "score": 0.7336
+      },
+      {
+        "chunk_id": "NBR6120#83_52_peso_próprio_da_estrutura",
+        "score": 0.7268
+      },
+      {
+        "chunk_id": "NBR6123#132_102_critério_para_verificação_do_efeito_de_desprendimento_de",
+        "score": 0.723
+      },
+      {
+        "chunk_id": "NBR6123#121_941_definições",
+        "score": 0.7138
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.048,
+      "generation_s": 0.92,
+      "total_s": 0.968
+    }
+  },
+  {
+    "id": 21,
+    "pergunta": "Como calcular o preço do m³ de concreto para uma obra em Brasília?",
+    "categoria": "fora_do_corpus",
+    "evidencia_esperada": null,
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.\n\n(A consulta está limitada a normas técnicas ABNT, e a pergunta envolve tema não normativo, especificamente relacionado a preços e orçamentos.)",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#10_ações_para_o_cálculo_de_estruturas_de_edificações",
+        "score": 0.7041
+      },
+      {
+        "chunk_id": "NBR6120#83_52_peso_próprio_da_estrutura",
+        "score": 0.6855
+      },
+      {
+        "chunk_id": "NBR6120#35_ações_variáveis_normais",
+        "score": 0.6668
+      },
+      {
+        "chunk_id": "NBR6123#116_92_velocidade_de_projeto_para_análise_dinâmica_na_direção_do",
+        "score": 0.6423
+      },
+      {
+        "chunk_id": "NBR6123#117_93_modelo_contínuo_simplificado",
+        "score": 0.6421
+      }
+    ],
+    "latency": {
+      "retrieval_s": 0.042,
+      "generation_s": 0.718,
+      "total_s": 0.76
+    }
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "recall@3_dense": 0.05,
+  "recall@5_dense": 0.05,
+  "recall@10_dense": 0.2,
+  "recall@3_sparse": 0.75,
+  "recall@5_sparse": 0.8,
+  "recall@10_sparse": 0.85,
+  "recall@3_hybrid": 0.45,
+  "recall@5_hybrid": 0.55,
+  "recall@10_hybrid": 0.9
+}

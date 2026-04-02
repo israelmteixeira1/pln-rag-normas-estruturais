@@ -1,0 +1,478 @@
+[
+  {
+    "id": 1,
+    "pergunta": "Qual o valor típico de carga acidental para um pavimento de escritório?",
+    "categoria": "factual_direta",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#106_612_redução_de_cargas_variáveis",
+        "score": 17.1248
+      },
+      {
+        "chunk_id": "NBR6123#150_1151_taxa_de_amortecimento",
+        "score": 13.7791
+      },
+      {
+        "chunk_id": "NBR6123#81_631_conceitos_gerais",
+        "score": 13.4373
+      },
+      {
+        "chunk_id": "NBR6120#114_pontes_rolantes",
+        "score": 13.2462
+      },
+      {
+        "chunk_id": "NBR6120#116_c2_forças_horizontais",
+        "score": 12.6665
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "pergunta": "Qual o valor de carga acidental para uma garagem de veículos leves?",
+    "categoria": "factual_direta",
+    "answer": "[NBR6120, Seção 6.6.1]\n\nA carga acidental para garagem de veículos leves é dada pela Tabela 13 da NBR6120. Considerando veículos leves, a Categoria I é a mais adequada, com as seguintes cargas:\n\n- Carga uniformemente distribuída: 3 kN/m²\n- Carga concentrada (Qk): 12 kN, atuando em uma região de 10 cm × 10 cm.\n\nPara forças horizontais devido ao impacto acidental de veículos, os valores são:\n\n- Fx: 100 kN\n- Fy: 50 kN\n- Altura de aplicação das forças Fx e Fy: 0,5 m.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#98_661_ações_em_garagens_e_demais_áreas_de_circulação_de_veícul",
+        "score": 17.1709
+      },
+      {
+        "chunk_id": "NBR6120#100_67_helipontos",
+        "score": 13.9764
+      },
+      {
+        "chunk_id": "NBR6123#90_643_pela_turbulência_da_esteira",
+        "score": 13.8656
+      },
+      {
+        "chunk_id": "NBR6120#92_tabela_10_continuação",
+        "score": 13.279
+      },
+      {
+        "chunk_id": "NBR6120#116_c2_forças_horizontais",
+        "score": 13.1078
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "pergunta": "O peso próprio da estrutura deve ser considerado como que tipo de carga?",
+    "categoria": "factual_direta",
+    "answer": "O peso próprio da estrutura deve ser considerado como uma ação permanente [NBR6120, Seção ações permanentes]. \n\nDe acordo com a norma, as ações permanentes são aquelas que atuam com valores praticamente constantes, ou com pequena variação em torno de sua média, durante a vida da edificação ou que aumentam com o tempo, tendendo a um valor-limite constante. Exemplos incluem o peso próprio da estrutura e demais elementos construtivos [NBR6120, Seção ações permanentes].\n\nAlém disso, os valores de peso próprio da estrutura devem ser calculados com as dimensões nominais dos elementos e com o valor médio do peso específico do material considerado [NBR6120, Seção 5.2].",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#83_52_peso_próprio_da_estrutura",
+        "score": 20.8343
+      },
+      {
+        "chunk_id": "NBR6120#92_tabela_10_continuação",
+        "score": 19.504
+      },
+      {
+        "chunk_id": "NBR6120#93_tabela_10_conclusão",
+        "score": 18.7407
+      },
+      {
+        "chunk_id": "NBR6120#29_ações_permanentes",
+        "score": 16.7484
+      },
+      {
+        "chunk_id": "NBR6120#115_c1_forças_verticais",
+        "score": 16.2108
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "pergunta": "Como tratar paredes divisórias cuja posição não é definida no projeto?",
+    "categoria": "factual_direta",
+    "answer": "Para paredes divisórias sem posição definida em projeto, você pode considerar uma carga uniformemente distribuída adicional, conforme Tabela 11 da NBR6120. Essa carga adicional depende do peso próprio da parede acabada.\n\n- Para peso próprio da parede acabada ≤ 1,0 kN/m, a carga adicional é de 0,5 kN/m².\n- Para 1,0 < peso próprio da parede acabada ≤ 2,0 kN/m, a carga adicional é de 0,75 kN/m².\n- Para 2,0 < peso próprio da parede acabada ≤ 3,0 kN/m, a carga adicional é de 1,0 kN/m².\n- Para peso próprio da parede acabada > 3,0 kN/m, não é permitido.\n\nEssa consideração pode ser dispensada para pavimentos cuja carga variável de projeto seja maior ou igual a 4,0 kN/m², exceto para alvenarias com peso próprio da parede acabada superior a 3,0 kN/m [NBR6120, Seção Tabela 10 (conclusão)].",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#93_tabela_10_conclusão",
+        "score": 26.6347
+      },
+      {
+        "chunk_id": "NBR6120#07_abnt_nbr_61202019",
+        "score": 17.6901
+      },
+      {
+        "chunk_id": "NBR6123#81_631_conceitos_gerais",
+        "score": 14.7067
+      },
+      {
+        "chunk_id": "NBR6120#95_64_cargas_variáveis_em_coberturas",
+        "score": 10.4084
+      },
+      {
+        "chunk_id": "NBR6120#92_tabela_10_continuação",
+        "score": 10.3251
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "pergunta": "Qual o peso específico do concreto armado?",
+    "categoria": "factual_direta",
+    "answer": "[NBR6120, Seção Tabela 1 (continuação)]\nO peso específico do concreto armado é 25 kN/m³.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#85_tabela_1_continuação",
+        "score": 12.9848
+      },
+      {
+        "chunk_id": "NBR6120#84_53_peso_específico_dos_materiais_de_construção",
+        "score": 11.8483
+      },
+      {
+        "chunk_id": "NBR6120#86_54_peso_de_componentes_construtivos",
+        "score": 9.4716
+      },
+      {
+        "chunk_id": "NBR6120#83_52_peso_próprio_da_estrutura",
+        "score": 9.3991
+      },
+      {
+        "chunk_id": "NBR6120#78_423_letras_gregas",
+        "score": 9.2218
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "pergunta": "Qual a carga que deve ser considerada ao longo de parapeitos e balcões?",
+    "categoria": "factual_direta",
+    "answer": "[NBR6120, Seção Tabela 10 (continuação)]\n- j Nas bordas de balcões, varandas, sacadas e terraços com guarda-corpo, prever carga variável de 2 kN/m, além do peso próprio do guarda-corpo. Considerar também forças horizontais variáveis conforme 6.3.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#93_tabela_10_conclusão",
+        "score": 20.6972
+      },
+      {
+        "chunk_id": "NBR6120#92_tabela_10_continuação",
+        "score": 18.7459
+      },
+      {
+        "chunk_id": "NBR6120#88_56_empuxos_e_pressões_hidrostáticas",
+        "score": 18.2905
+      },
+      {
+        "chunk_id": "NBR6123#121_941_definições",
+        "score": 18.2883
+      },
+      {
+        "chunk_id": "NBR6123#100_7251_abas_perpendiculares_à_direção_do_vento",
+        "score": 17.8331
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "pergunta": "Quais critérios determinam a categoria de projeto para garagens e áreas de circulação de veículos?",
+    "categoria": "factual_direta",
+    "answer": "[NBR6120, Seção 6.6.1]\nA seleção da categoria de projeto de garagens e demais áreas de circulação de veículos deve ser feita em função da altura livre disponível do acesso de veículos (coluna 4 da Tabela 13) e do PBT (coluna 2 da Tabela 13). Caso o usuário da edificação disponha de meios para controle dos tipos de veículos que acessam a edificação, é possível projetar para categorias diferentes daquela em função da altura disponível.",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#112_exemplos_de_sinalização_de_garagens_e_demais_áreas_de_circul",
+        "score": 34.3861
+      },
+      {
+        "chunk_id": "NBR6120#98_661_ações_em_garagens_e_demais_áreas_de_circulação_de_veícul",
+        "score": 31.9549
+      },
+      {
+        "chunk_id": "NBR6120#07_abnt_nbr_61202019",
+        "score": 27.4983
+      },
+      {
+        "chunk_id": "NBR6120#06_página",
+        "score": 27.2267
+      },
+      {
+        "chunk_id": "NBR6120#44_barreiras_de_veículos",
+        "score": 22.6164
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "pergunta": "Qual a carga variável mínima a considerar em coberturas com acesso apenas para manutenção?",
+    "categoria": "factual_direta",
+    "answer": "De acordo com a norma [NBR6120, Seção 6.4], para coberturas acessíveis apenas para manutenção, a carga variável uniformemente distribuída mínima a ser considerada é de 0,25 kN/m², independentemente da inclinação da cobertura, desde que atendidas as condições de projeto, como sistema de drenagem suficiente e rigidez adequada. Além disso, todo elemento isolado de cobertura deve ser projetado para suportar uma carga concentrada de 1 kN, na posição mais desfavorável, além do carregamento permanente [NBR6120, Seção 6.4].",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#95_64_cargas_variáveis_em_coberturas",
+        "score": 27.1617
+      },
+      {
+        "chunk_id": "NBR6120#92_tabela_10_continuação",
+        "score": 22.401
+      },
+      {
+        "chunk_id": "NBR6120#94_63_forças_horizontais_variáveis",
+        "score": 20.5167
+      },
+      {
+        "chunk_id": "NBR6120#106_612_redução_de_cargas_variáveis",
+        "score": 19.8805
+      },
+      {
+        "chunk_id": "NBR6120#91_62_cargas_variáveis",
+        "score": 18.3533
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "pergunta": "Quando é permitido reduzir as cargas acidentais em um edifício?",
+    "categoria": "factual_direta",
+    "answer": "A redução das cargas variáveis é permitida para a determinação de esforços solicitantes em pilares e fundações que suportem \"n\" andares acima do elemento em questão, com conjuntos de pisos adjacentes com o mesmo tipo de uso. O valor da carga variável de uso pode ser multiplicado por um coeficiente de redução αn, conforme a Tabela 19 [NBR6120, Seção 6.12].\n\nNo entanto, não é permitida a redução das cargas variáveis de garagens, reservatórios, coberturas, jardins, depósitos de explosivos e inflamáveis e áreas de estoque em geral, áreas de armamentos, áreas técnicas, instalações nucleares, indústrias, estádios, teatros e cinemas, passarelas, assembleias com assentos fixos ou móveis e demais áreas cujas cargas variáveis não sejam redutíveis, conforme a Tabela 10 [NBR6120, Seção 6.12].",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#93_tabela_10_conclusão",
+        "score": 13.4056
+      },
+      {
+        "chunk_id": "NBR6120#106_612_redução_de_cargas_variáveis",
+        "score": 11.4329
+      },
+      {
+        "chunk_id": "NBR6123#129_963_considerações_gerais",
+        "score": 11.1019
+      },
+      {
+        "chunk_id": "NBR6120#95_64_cargas_variáveis_em_coberturas",
+        "score": 10.6663
+      },
+      {
+        "chunk_id": "NBR6120#118_c31_edificações_com_um_caminho_de_rolamento_e_uma_nave",
+        "score": 10.4665
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "pergunta": "Qual a redução percentual de cargas acidentais quando há 6 ou mais pisos?",
+    "categoria": "multi_trecho",
+    "answer": "De acordo com a Tabela 19 da norma [NBR6120, Seção 6.12], quando há 6 ou mais pisos, o multiplicador αn das cargas variáveis é de 0,4. \n\nIsso significa que as cargas variáveis podem ser reduzidas em 60% (1 - 0,4 = 0,6, ou seja, 60% de redução).",
+    "sources": [
+      {
+        "chunk_id": "NBR6120#106_612_redução_de_cargas_variáveis",
+        "score": 22.1748
+      },
+      {
+        "chunk_id": "NBR6123#93_71_muros_e_placas_retangulares",
+        "score": 17.2935
+      },
+      {
+        "chunk_id": "NBR6120#103_610_ações_para_pisos_e_pavimentos_de_galpões_depósitos_e_cen",
+        "score": 17.2625
+      },
+      {
+        "chunk_id": "NBR6120#06_página",
+        "score": 15.5385
+      },
+      {
+        "chunk_id": "NBR6123#155_1156_estabilidade_em_relação_ao_fenômeno_oscilatório_galopan",
+        "score": 14.4459
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "pergunta": "Como é definida a velocidade básica do vento V0 pela NBR 6123?",
+    "categoria": "factual_direta",
+    "answer": "A velocidade básica do vento, V0, é definida como a velocidade de uma rajada de 3 s, a 10 m acima do terreno, em campo aberto e plano, excedida em média uma vez em 50 anos [NBR6123, Seção 5.1].",
+    "sources": [
+      {
+        "chunk_id": "NBR6123#52_51_velocidade_básica_do_vento_v0",
+        "score": 23.3381
+      },
+      {
+        "chunk_id": "NBR6123#46_42_pressão_dinâmica",
+        "score": 20.3487
+      },
+      {
+        "chunk_id": "NBR6123#10_prefácio",
+        "score": 16.9291
+      },
+      {
+        "chunk_id": "NBR6123#12_introdução",
+        "score": 16.6193
+      },
+      {
+        "chunk_id": "NBR6123#53_52_fator_topográfico_s1",
+        "score": 16.3501
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "pergunta": "O que é a pressão dinâmica do vento e como é calculada?",
+    "categoria": "factual_direta",
+    "answer": "A pressão dinâmica do vento é calculada pela expressão: q = 0,613 * Vk^2, onde ρ é a massa específica do ar de referência, igual a 1,226 kg/m³, e Vk é a velocidade característica do vento, expressa em metros por segundo (m/s). A velocidade característica do vento (Vk) é obtida multiplicando a velocidade básica do vento (V0) pelos fatores S1, S2 e S3, de acordo com as Seções 5.2 a 5.5 da norma [NBR6123, Seção 4.2].",
+    "sources": [
+      {
+        "chunk_id": "NBR6123#45_41_orientações_gerais",
+        "score": 22.1662
+      },
+      {
+        "chunk_id": "NBR6123#119_932_determinação_da_resposta_dinâmica_na_direção_do_vento",
+        "score": 19.5145
+      },
+      {
+        "chunk_id": "NBR6123#46_42_pressão_dinâmica",
+        "score": 19.1328
+      },
+      {
+        "chunk_id": "NBR6123#93_71_muros_e_placas_retangulares",
+        "score": 18.03
+      },
+      {
+        "chunk_id": "NBR6123#81_631_conceitos_gerais",
+        "score": 17.9043
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "pergunta": "Quais são os três fatores que multiplicam V0 para obter a velocidade característica Vk?",
+    "categoria": "multi_trecho",
+    "answer": "De acordo com a norma [NBR6123, Seção 4.2 Pressão dinâmica], os três fatores que multiplicam V0 para obter a velocidade característica Vk são:\n\n1. S1\n2. S2\n3. S3\n\nEsses fatores são utilizados para calcular a velocidade característica do vento, Vk, a partir da velocidade básica do vento, V0, conforme a seguinte expressão:\n\nVk = V0 * S1 * S2 * S3",
+    "sources": [
+      {
+        "chunk_id": "NBR6123#156_a1_fator_s_2",
+        "score": 19.1867
+      },
+      {
+        "chunk_id": "NBR6123#46_42_pressão_dinâmica",
+        "score": 18.5274
+      },
+      {
+        "chunk_id": "NBR6123#52_51_velocidade_básica_do_vento_v0",
+        "score": 13.4699
+      },
+      {
+        "chunk_id": "NBR6123#58_54_fator_estatístico_s3",
+        "score": 12.9837
+      },
+      {
+        "chunk_id": "NBR6123#61_abnt_nbr_61232023",
+        "score": 12.6885
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "pergunta": "O que considera o fator topográfico S1 no cálculo do vento?",
+    "categoria": "factual_direta",
+    "answer": "O fator topográfico S1 considera as variações do relevo do terreno e é determinado de acordo com as seguintes condições:\n\n- terreno plano ou fracamente acidentado;\n- taludes e morros;\n- vales profundos, protegidos de ventos de qualquer direção.\n\nOs procedimentos para determinação de S1 são apresentados para cada uma destas condições, considerando parâmetros como a altura medida a partir da superfície do terreno, a diferença de nível entre a base e o topo do talude ou morro e a inclinação média do talude ou encosta do morro [NBR6123, Seção 5.2].",
+    "sources": [
+      {
+        "chunk_id": "NBR6123#53_52_fator_topográfico_s1",
+        "score": 23.9372
+      },
+      {
+        "chunk_id": "NBR6123#54_53_rugosidade_do_terreno_dimensões_da_edificação_estrutura_o",
+        "score": 13.8529
+      },
+      {
+        "chunk_id": "NBR6123#41_31_letras_romanas_maiúsculas",
+        "score": 9.5734
+      },
+      {
+        "chunk_id": "NBR6123#58_54_fator_estatístico_s3",
+        "score": 9.4516
+      },
+      {
+        "chunk_id": "NBR6123#76_623_coeficientes_de_pressão_externa_para_coberturas_curvas_a",
+        "score": 9.0927
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "pergunta": "O que considera o fator S2 no cálculo da velocidade do vento?",
+    "categoria": "factual_direta",
+    "answer": "O fator S2 considera o efeito combinado da rugosidade do terreno, da variação da velocidade do vento com a altura acima do terreno e das dimensões da edificação, estrutura, parte da estrutura ou componente em consideração [NBR6123, Seção 5.3].",
+    "sources": [
+      {
+        "chunk_id": "NBR6123#54_53_rugosidade_do_terreno_dimensões_da_edificação_estrutura_o",
+        "score": 22.4446
+      },
+      {
+        "chunk_id": "NBR6123#53_52_fator_topográfico_s1",
+        "score": 12.6241
+      },
+      {
+        "chunk_id": "NBR6123#58_54_fator_estatístico_s3",
+        "score": 12.1362
+      },
+      {
+        "chunk_id": "NBR6123#156_a1_fator_s_2",
+        "score": 11.9771
+      },
+      {
+        "chunk_id": "NBR6123#61_abnt_nbr_61232023",
+        "score": 11.9245
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "pergunta": "Para uma residência normal, qual o valor mínimo do fator estatístico S3?",
+    "categoria": "factual_direta",
+    "answer": "Para uma residência normal, enquadrada no grupo 3, o valor mínimo do fator estatístico S3 é 1,00 [NBR6123, Seção 5.4].",
+    "sources": [
+      {
+        "chunk_id": "NBR6123#58_54_fator_estatístico_s3",
+        "score": 17.1364
+      },
+      {
+        "chunk_id": "NBR6123#163_fator_estatístico_s3_para_a_probabilidade_pm_e_vida_útil_de_",
+        "score": 14.2519
+      },
+      {
+        "chunk_id": "NBR6123#123_943_cálculo_da_resposta_dinâmica_na_direção_do_vento",
+        "score": 8.604
+      },
+      {
+        "chunk_id": "NBR6123#42_32_letras_romanas_minúsculas",
+        "score": 8.1174
+      },
+      {
+        "chunk_id": "NBR6123#09_abnt_nbr_61232023",
+        "score": 7.2001
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "pergunta": "Como calcular o preço do m³ de concreto para uma obra em Brasília?",
+    "categoria": "fora_do_corpus",
+    "answer": "Não encontrei informação suficiente nas normas consultadas para responder esta pergunta.",
+    "sources": [
+      {
+        "chunk_id": "NBR6123#81_631_conceitos_gerais",
+        "score": 11.7394
+      },
+      {
+        "chunk_id": "NBR6120#124_bibliografia",
+        "score": 11.6046
+      },
+      {
+        "chunk_id": "NBR6120#95_64_cargas_variáveis_em_coberturas",
+        "score": 11.1837
+      },
+      {
+        "chunk_id": "NBR6120#86_54_peso_de_componentes_construtivos",
+        "score": 10.7111
+      },
+      {
+        "chunk_id": "NBR6120#92_tabela_10_continuação",
+        "score": 10.6703
+      }
+    ]
+  }
+]
