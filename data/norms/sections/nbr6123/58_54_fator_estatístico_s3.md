@@ -1,0 +1,23 @@
+---
+title: "5.4 Fator estatístico, S3"
+summary: "O fator estatístico S3 é baseado em conceitos estatísticos e considera o grau de segurança requerido e a vida útil da ed..."
+norm_id: "NBR6123"
+edicao: "2023"
+---
+## 5.4 Fator estatístico, S3
+
+O fator estatístico S3 é baseado em conceitos estatísticos e considera o grau de segurança requerido e a vida útil da edificação, estrutura ou componente (ver Anexo B). Conforme 5.1, a velocidade básica V0 é a velocidade do vento que apresenta um período de recorrência médio Tp de 50 anos. A probabilidade de que a velocidade V0 seja igualada ou excedida neste período é de 63 %.
+
+O nível de probabilidade (0,63) e a vida útil (50 anos) adotados são considerados adequados para edificações normais destinadas a moradias, hotéis, escritórios etc. (grupo 3). Os valores mínimos do fator S3 são indicados na Tabela 4.
+
+Tabela 4 - Valores mínimos do fator estatístico S3
+
+|   Grupo | Descrição                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | S 3   |   T p (anos) |
+|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|--------------|
+|       1 | Estruturas cuja ruína total ou parcial pode afetar a segurança ou possibilidade de socorro a pessoas após uma tempestade destrutiva (hospitais, quartéis de bombeiros e de forças de segurança, edifícios de centrais de controle, etc.). Pontes rodoviárias e ferroviárias. Estruturas que abrigam substâncias inflamáveis, tóxicas e/ou explosivas. Vedações das edificações do grupo 1 (telhas, vidros, painéis de vedação).                                                             | 1,11  |          100 |
+|       2 | Estruturas cuja ruína represente substancial risco à vida humana, particularmente a pessoas em aglomerações, crianças e jovens, incluindo, mas não limitado a: ● edificações com capacidade de aglomeração de mais de 300 pessoas em um mesmo ambiente, como centros de convenções, ginásios, estádios etc. ● creches com capacidade maior do que 150 pessoas; ● escolas com capacidade maior do que 250 pessoas; Vedações das edificações do grupo 2 (telhas, vidros, painéis de vedação). | 1,06  |           75 |
+|       3 | Edificações para residências, hotéis, comércio, indústrias. Estruturas ou elementos estruturais desmontáveis com vistas a reutilização. Vedações das edificações do grupo 3 (telhas, vidros, painéis de vedação).                                                                                                                                                                                                                                                                           | 1,00  |           50 |
+|       4 | Edificações não destinadas à ocupação humana (depósitos, silos) e sem circulação de pessoas no entorno. Vedações das edificações do grupo 4 (telhas, vidros, painéis de vedação).                                                                                                                                                                                                                                                                                                           | 0,95  |           37 |
+|       5 | Edificações temporárias não reutilizáveis. Estruturas dos Grupos 1 a 4 durante a construção (fator aplicável em um prazo máximo de 2 anos). Vedações das edificações do grupo 5 (telhas, vidros, painéis de vedação).                                                                                                                                                                                                                                                                       | 0,83  |           15 |
+
+NOTA Exclusivamente para o projeto das vedações, se permite que a velocidade característica seja calculada com o fator (0,92 x S 3 ), em vez de S 3

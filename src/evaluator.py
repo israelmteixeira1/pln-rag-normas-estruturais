@@ -97,23 +97,23 @@ def _is_hit(results: list[dict[str, Any]], evidencias: list[str]) -> bool:
     """
     Verifica se algum resultado recuperado corresponde a alguma evidência.
 
-    Correspondência baseada em ``doc_id`` (ver docstring do módulo).
+    Correspondência por chunk_id exato.
 
     Parâmetros
     ----------
     results : list[dict]
-        Resultados do retriever (com chave ``doc_id``).
+        Resultados do retriever (com chave ``chunk_id``).
     evidencias : list[str]
-        Lista de evidências esperadas (strings no formato ``"NBRxxxx#..."``)
+        Lista de evidências esperadas (chunk_ids no formato ``"NBR6120#07_tabela2"``)
 
     Retorna
     -------
     bool
         True se pelo menos um resultado corresponde a pelo menos uma evidência.
     """
-    retrieved_doc_ids = {r["doc_id"] for r in results}
-    expected_doc_ids = {_extract_doc_id(e) for e in evidencias}
-    return bool(retrieved_doc_ids & expected_doc_ids)
+    retrieved_ids = {r["chunk_id"] for r in results}
+    expected_ids = set(evidencias)
+    return bool(retrieved_ids & expected_ids)
 
 
 def run_evaluation(
@@ -347,15 +347,31 @@ def print_comparative_report(comp_results: dict) -> None:
 
 
 if __name__ == "__main__":
-    # Execução direta: avalia o retriever com o golden_set
+    # Execução direta: avaliação comparativa dos 3 modos (dense/sparse/hybrid)
     from src.indexer import load_index, retrieve as _retrieve
+    from src.hybrid_search import SparseRetriever, HybridRetriever
 
     idx, chks, mdl = load_index()
 
-    def retrieve_fn(query: str, k: int) -> list[dict]:
+    # Cria retrievers para cada modo
+    sparse_ret = SparseRetriever(chks)
+    hybrid_ret = HybridRetriever(chks, idx, mdl)
+
+    def dense_fn(query: str, k: int) -> list[dict]:
         return _retrieve(query, idx, chks, mdl, k=k)
 
+    def sparse_fn(query: str, k: int) -> list[dict]:
+        return sparse_ret.retrieve(query, k=k)
+
+    def hybrid_fn(query: str, k: int) -> list[dict]:
+        return hybrid_ret.retrieve(query, k=k)
+
     gs = load_golden_set()
-    results = run_evaluation(retrieve_fn, gs)
-    print_evaluation_report(results)
-    save_evaluation_report(results)
+
+    # Avaliação comparativa
+    comp = run_comparative_evaluation(dense_fn, sparse_fn, hybrid_fn, gs)
+    print_comparative_report(comp)
+
+    # Detalhes do modo dense (baseline)
+    print_evaluation_report(comp["modes"]["dense"])
+    save_evaluation_report(comp["modes"]["dense"])

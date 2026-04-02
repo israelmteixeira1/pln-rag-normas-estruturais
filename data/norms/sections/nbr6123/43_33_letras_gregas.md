@@ -1,0 +1,24 @@
+---
+title: "3.3 Letras gregas"
+summary: "- α ângulo de incidência do vento, indicado na figura de referência"
+norm_id: "NBR6123"
+edicao: "2023"
+---
+## 3.3 Letras gregas
+
+- α ângulo de incidência do vento, indicado na figura de referência
+
+| ȕ     | ângulo central entre a direção do vento e o raio que passa pelo ponto em consideração na periferia de um cilindro circular                                                                                                                                                                                                  |
+|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Ȗ     | expoente da expressão da forma modal para o primeiro modo de vibração                                                                                                                                                                                                                                                       |
+| ∆ p   | pressão efetiva em um 'ponto' (área muito pequena) na superfície de uma edificação, estrutura, elemento estrutural ou componente: ∆ p = ∆ p e - ∆ p i                                                                                                                                                                       |
+| ∆ p e | pressão efetiva externa: diferença entre a pressão atmosférica em um 'ponto' (área muito pequena) na superfície externa de uma edificação, estrutura, elemento estrutural ou componente e a pressão atmosférica do vento incidente, a barlavento da estrutura, na corrente de ar não perturbada pela presença de obstáculos |
+| ∆ p i | pressão efetiva interna: diferença entre a pressão atmosférica em um 'ponto' (área muito pequena) na superfície interna de uma edificação, estrutura, elemento estrutural ou componente e a pressão atmosférica do vento incidente, a barlavento da estrutura, na corrente de ar não perturbada pela presença de obstáculos |
+| ζ     | razão de amortecimento ou taxa de amortecimento                                                                                                                                                                                                                                                                             |
+| Ș     | fator de proteção, em reticulados paralelos                                                                                                                                                                                                                                                                                 |
+| ș     | ângulo de inclinação de telhados;                                                                                                                                                                                                                                                                                           |
+| ș t   | ângulo de inclinação da superfície média de taludes e encostas de morros, em escoamento de ar considerado bidimensional                                                                                                                                                                                                     |
+| ξ     | fator dinâmico                                                                                                                                                                                                                                                                                                              |
+| ρ     | massa específica do ar; valor de referência igual a 1,226 kg/m 3                                                                                                                                                                                                                                                            |
+| ϕ     | índice de área exposta: área frontal efetiva de um reticulado dividida pela área frontal da superfície limitada pelo contorno do reticulado                                                                                                                                                                                 |
+| ψ     | grandeza adimensional definida por: ψ = m i / m 0                                                                                                                                                                                                                                                                           |

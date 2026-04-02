@@ -1,274 +1,202 @@
 """
 src/ingestion.py
 ================
-Módulo de ingestão de PDFs normativos.
+Módulo de ingestão de seções normativas a partir de arquivos Markdown.
 
 Responsabilidades
 -----------------
-- Extrair texto bruto dos PDFs com pdfplumber
-- Associar metadados fixos a cada documento (doc_id, titulo, fonte, edição)
-- Detectar estrutura hierárquica via regex para informar o chunker
+- Ler os arquivos de seção Markdown em ``data/norms/sections/<norm_id>/``
+- Extrair frontmatter YAML (title, summary, norm_id, edicao) de cada seção
+- Agregar seções de múltiplas normas em uma lista unificada de chunks
 
-Documentos suportados
----------------------
-- NBR6118_2023.pdf  → Projeto de estruturas de concreto
-- NBR6120_2019.pdf  → Ações para o cálculo de estruturas de edifícios
-- NBR6123_2023.pdf  → Forças devidas ao vento em edificações
+Os arquivos de seção são gerados pelo script
+``scripts/split_sections_auto.py``.
 """
 
 from __future__ import annotations
 
-import os
 import re
 from pathlib import Path
 from typing import Any
 
-import pdfplumber
 from tqdm import tqdm
 
 # ---------------------------------------------------------------------------
-# Diretório padrão dos PDFs (relativo à raiz do projeto)
+# Diretório base das seções (relativo à raiz do projeto)
 # ---------------------------------------------------------------------------
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
-NORMS_DIR = _PROJECT_ROOT / "data" / "norms"
+SECTIONS_BASE_DIR = _PROJECT_ROOT / "data" / "norms" / "sections"
 
 # ---------------------------------------------------------------------------
-# Metadados fixos por documento
+# Metadados fixos por norma (complementam o frontmatter dos arquivos)
 # ---------------------------------------------------------------------------
-DOCUMENT_METADATA: dict[str, dict[str, str]] = {
-    "NBR6118": {
-        "doc_id": "NBR6118",
-        "titulo": "Projeto de estruturas de concreto — Procedimento",
-        "fonte": "ABNT",
-        "edicao": "2023",
-        "filename": "NBR6118_2023.pdf",
-    },
-    "NBR6120": {
+NORMS_METADATA: dict[str, dict[str, str]] = {
+    "nbr6120": {
         "doc_id": "NBR6120",
-        "titulo": "Ações para o cálculo de estruturas de edificações",
+        "titulo": "Cargas para o cálculo de estruturas de edificações",
         "fonte": "ABNT",
-        "edicao": "2019",
-        "filename": "NBR6120_2019.pdf",
+        "edicao": "1980 (Errata 2000)",
     },
-    "NBR6123": {
+    "nbr6123": {
         "doc_id": "NBR6123",
         "titulo": "Forças devidas ao vento em edificações",
         "fonte": "ABNT",
-        "edicao": "2023 (Proposta de Revisão)",
-        "filename": "NBR6123_2023_PROPOSTA.pdf",
+        "edicao": "2023",
     },
 }
 
 # ---------------------------------------------------------------------------
-# Regex para detecção de seções normativas
-# Padrão: número seguido de ponto(s) + letra maiúscula inicial
-# Ex.: "4.2.3 Ações variáveis"  "13 — Dimensionamento"
+# Regex para extrair frontmatter YAML
 # ---------------------------------------------------------------------------
-_SECTION_PATTERN = re.compile(
-    r"^(\d{1,2}(?:\.\d{1,3}){0,4})\s+[\u00C0-\u017EA-Z]",
-    re.MULTILINE,
+_FRONTMATTER_RE = re.compile(
+    r"^---\s*\n(.*?)\n---\s*\n",
+    re.DOTALL,
 )
 
+_YAML_FIELD_RE = re.compile(r'^(\w+):\s*"?(.+?)"?\s*$', re.MULTILINE)
 
-def _detect_section(text: str) -> str:
+
+def _parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
+    """Extrai frontmatter YAML e conteúdo de um arquivo de seção."""
+    match = _FRONTMATTER_RE.match(text)
+    if not match:
+        return {}, text.strip()
+
+    yaml_block = match.group(1)
+    content = text[match.end():].strip()
+
+    fields = {}
+    for field_match in _YAML_FIELD_RE.finditer(yaml_block):
+        fields[field_match.group(1)] = field_match.group(2).strip('"')
+
+    return fields, content
+
+
+def load_sections(
+    sections_dir: str | Path | None = None,
+    norm_ids: list[str] | None = None,
+) -> list[dict[str, Any]]:
     """
-    Detecta o número da seção mais provável no início de um bloco de texto.
-
-    Percorre as primeiras 300 caracteres do texto procurando o padrão
-    numérico de item normativo (ex.: '4.2', '13.2.1').
+    Carrega seções normativas como chunks com metadados.
 
     Parâmetros
     ----------
-    text : str
-        Texto de um chunk ou página.
-
-    Retorna
-    -------
-    str
-        Número da seção (ex.: '4.2.3') ou 'intro' se nenhum for detectado.
-    """
-    sample = text[:300]
-    match = _SECTION_PATTERN.search(sample)
-    if match:
-        return match.group(1)
-    return "intro"
-
-
-def extract_text_from_pdf(pdf_path: str | Path) -> list[dict[str, Any]]:
-    """
-    Extrai texto página a página de um PDF usando pdfplumber.
-
-    Tabelas são extraídas separadamente e concatenadas abaixo do texto
-    da página para preservar o contexto numérico (valores, unidades).
-    O texto corrido é extraído apenas das regiões fora das tabelas,
-    evitando duplicação de conteúdo tabular no texto principal.
-
-    Nota: o índice vetorial deve ser reconstruído após re-executar a ingestão.
-
-    Parâmetros
-    ----------
-    pdf_path : str | Path
-        Caminho absoluto para o arquivo PDF.
+    sections_dir : str | Path | None
+        Diretório base das seções. Padrão: ``data/norms/sections/``.
+        Pode apontar diretamente para um subdiretório de norma específica.
+    norm_ids : list[str] | None
+        Lista de IDs de norma a carregar (ex.: ``["nbr6120", "nbr6118"]``).
+        Se None, carrega todas as normas encontradas em ``sections_dir``.
 
     Retorna
     -------
     list[dict]
-        Lista de dicts com ``page_num`` (int) e ``text`` (str) para cada página.
+        Lista de chunks (um por seção), cada um com:
+        - ``chunk_id``  : ex. ``NBR6120#02_objetivo``
+        - ``doc_id``    : ex. ``NBR6120``
+        - ``titulo``    : título do documento completo
+        - ``fonte``     : ``ABNT``
+        - ``edicao``    : edição da norma
+        - ``secao``     : título da seção (do frontmatter)
+        - ``summary``   : resumo da seção (do frontmatter)
+        - ``texto``     : conteúdo puro (para embedding)
+        - ``texto_md``  : conteúdo com frontmatter (para exibição)
+        - ``n_chars``   : tamanho do conteúdo
+        - ``filename``  : nome do arquivo de seção
     """
-    pdf_path = Path(pdf_path)
-    pages: list[dict[str, Any]] = []
+    base = Path(sections_dir) if sections_dir else SECTIONS_BASE_DIR
 
-    with pdfplumber.open(pdf_path) as pdf:
-        for i, page in enumerate(pdf.pages, start=1):
-            # Detecta bounding boxes das tabelas para excluir da extração de texto
-            found_tables = page.find_tables()
-            table_bboxes = [t.bbox for t in found_tables]
-
-            # Filtra caracteres que estão dentro de alguma tabela
-            def not_in_tables(obj):
-                for bbox in table_bboxes:
-                    x0, top, x1, bottom = bbox
-                    if (obj.get("x0", 0) >= x0 - 2 and
-                            obj.get("x1", 0) <= x1 + 2 and
-                            obj.get("top", 0) >= top - 2 and
-                            obj.get("bottom", 0) <= bottom + 2):
-                        return False
-                return True
-
-            filtered_page = page.filter(not_in_tables)
-            raw_text = filtered_page.extract_text(x_tolerance=3, y_tolerance=3) or ""
-
-            # Extrai tabelas e serializa como texto TSV para preservar
-            # os valores e unidades sem perder a estrutura matricial.
-            # Páginas de índice/sumário (detectadas pela abundância de "......")
-            # não recebem bloco de tabela para evitar ruído.
-            is_toc_page = raw_text.count("......") > 5
-
-            table_texts: list[str] = []
-            if not is_toc_page:
-                for table in page.extract_tables():
-                    rows = []
-                    for row in table:
-                        cleaned = [
-                            str(cell).strip() if cell else "" for cell in row
-                        ]
-                        rows.append("\t".join(cleaned))
-                    if rows:
-                        table_texts.append("[TABELA]\n" + "\n".join(rows) + "\n[/TABELA]")
-
-            combined = raw_text
-            if table_texts:
-                combined = raw_text + "\n\n" + "\n\n".join(table_texts)
-
-            if combined.strip():
-                pages.append({"page_num": i, "text": combined.strip()})
-
-    return pages
-
-
-def load_document(doc_id: str, norms_dir: str | Path = NORMS_DIR) -> dict[str, Any]:
-    """
-    Carrega texto completo e metadados de um documento normativo.
-
-    Parâmetros
-    ----------
-    doc_id : str
-        Identificador do documento ('NBR6118', 'NBR6120' ou 'NBR6123').
-    norms_dir : str | Path
-        Diretório onde os PDFs estão armazenados.
-
-    Retorna
-    -------
-    dict
-        Dicionário com todos os metadados + lista de páginas + texto completo.
-
-    Raises
-    ------
-    ValueError
-        Se ``doc_id`` não estiver registrado em DOCUMENT_METADATA.
-    FileNotFoundError
-        Se o arquivo PDF não existir em ``norms_dir``.
-    """
-    if doc_id not in DOCUMENT_METADATA:
-        raise ValueError(
-            f"doc_id '{doc_id}' desconhecido. "
-            f"Opções: {list(DOCUMENT_METADATA.keys())}"
+    if not base.exists():
+        raise FileNotFoundError(
+            f"Diretório de seções não encontrado: {base}. "
+            "Execute scripts/split_sections_auto.py primeiro."
         )
 
-    meta = DOCUMENT_METADATA[doc_id].copy()
-    pdf_path = Path(norms_dir) / meta["filename"]
+    # Descobre subdiretórios de normas
+    if norm_ids is not None:
+        norm_dirs = [base / nid.lower() for nid in norm_ids]
+    else:
+        # Tenta subdiretórios; se não houver, assume que base é o próprio diretório de seções
+        subdirs = [d for d in sorted(base.iterdir()) if d.is_dir()]
+        norm_dirs = subdirs if subdirs else [base]
 
-    if not pdf_path.exists():
-        raise FileNotFoundError(f"PDF não encontrado: {pdf_path}")
+    all_chunks: list[dict[str, Any]] = []
 
-    print(f"[ingestion] Carregando {doc_id} ({pdf_path.name})...")
-    pages = extract_text_from_pdf(pdf_path)
+    for norm_dir in norm_dirs:
+        if not norm_dir.exists():
+            print(f"[ingestion] ⚠  Diretório não encontrado: {norm_dir} — pulando.")
+            continue
 
-    # Texto completo: concatena todas as páginas
-    full_text = "\n\n".join(p["text"] for p in pages)
+        # Determina metadados da norma pelo nome do diretório
+        dir_key = norm_dir.name.lower()
+        meta = NORMS_METADATA.get(dir_key, {
+            "doc_id": dir_key.upper(),
+            "titulo": dir_key.upper(),
+            "fonte": "ABNT",
+            "edicao": "—",
+        })
 
-    return {
-        **meta,
-        "pages": pages,
-        "n_pages": len(pages),
-        "full_text": full_text,
-        "n_chars": len(full_text),
-    }
+        md_files = sorted(norm_dir.glob("*.md"))
+        if not md_files:
+            print(f"[ingestion] ⚠  Nenhum .md em {norm_dir} — pulando.")
+            continue
 
+        print(f"[ingestion] Carregando {meta['doc_id']} de {norm_dir} ...")
 
-def load_all_documents(norms_dir: str | Path = NORMS_DIR) -> list[dict[str, Any]]:
-    """
-    Carrega todos os documentos normativos registrados.
+        for md_file in tqdm(md_files, desc=f"  {meta['doc_id']}"):
+            raw_text = md_file.read_text(encoding="utf-8")
+            frontmatter, content = _parse_frontmatter(raw_text)
 
-    Parâmetros
-    ----------
-    norms_dir : str | Path
-        Diretório onde os PDFs estão armazenados.
+            if not content.strip():
+                continue
 
-    Retorna
-    -------
-    list[dict]
-        Lista com um dicionário por documento, incluindo metadados e texto.
-    """
-    documents = []
-    doc_ids = list(DOCUMENT_METADATA.keys())
+            section_id = md_file.stem
+            chunk_id = f"{meta['doc_id']}#{section_id}"
+            section_title = frontmatter.get("title", section_id)
+            summary = frontmatter.get("summary", "")
+            edicao = frontmatter.get("edicao", meta["edicao"])
 
-    for doc_id in tqdm(doc_ids, desc="Ingestão de normas"):
-        try:
-            doc = load_document(doc_id, norms_dir)
-            documents.append(doc)
-            print(
-                f"  ✓ {doc_id}: {doc['n_pages']} páginas, "
-                f"{doc['n_chars']:,} caracteres"
-            )
-        except FileNotFoundError as e:
-            print(f"  ✗ {doc_id}: {e}")
+            all_chunks.append({
+                "chunk_id": chunk_id,
+                "doc_id": meta["doc_id"],
+                "titulo": meta["titulo"],
+                "fonte": meta["fonte"],
+                "edicao": edicao,
+                "secao": section_title,
+                "summary": summary,
+                "texto": content,
+                "texto_md": raw_text.strip(),
+                "n_chars": len(content),
+                "filename": md_file.name,
+            })
 
-    print(f"\n[ingestion] {len(documents)}/{len(doc_ids)} documentos carregados.")
-    return documents
+    print(f"\n[ingestion] ✓ {len(all_chunks)} seções carregadas no total.")
+    return all_chunks
 
 
 # ---------------------------------------------------------------------------
 # Utilitário de inspeção
 # ---------------------------------------------------------------------------
 
-def print_document_summary(doc: dict[str, Any]) -> None:
-    """Exibe um resumo formatado de um documento carregado."""
-    print(f"\n{'='*60}")
-    print(f"  doc_id  : {doc['doc_id']}")
-    print(f"  titulo  : {doc['titulo']}")
-    print(f"  fonte   : {doc['fonte']}")
-    print(f"  edicao  : {doc['edicao']}")
-    print(f"  páginas : {doc['n_pages']}")
-    print(f"  chars   : {doc['n_chars']:,}")
-    print(f"{'='*60}")
-    # Amostra das primeiras 500 chars do texto
-    preview = doc["full_text"][:500].replace("\n", " ")
-    print(f"  preview : {preview}...")
+def print_sections_summary(chunks: list[dict[str, Any]]) -> None:
+    """Exibe um resumo formatado das seções carregadas, agrupadas por norma."""
+    from itertools import groupby
+
+    print(f"\n{'='*70}")
+    print(f"  Total: {len(chunks)} seções | {sum(c['n_chars'] for c in chunks):,} chars")
+    print(f"{'='*70}")
+
+    for doc_id, group in groupby(chunks, key=lambda c: c["doc_id"]):
+        group_list = list(group)
+        print(f"\n  [{doc_id}] {group_list[0]['titulo']}")
+        print(f"  Fonte: {group_list[0]['fonte']} | Edição: {group_list[0]['edicao']}")
+        print(f"  Seções: {len(group_list)}")
+        for c in group_list:
+            print(f"    {c['chunk_id']:50s} {c['n_chars']:6,} chars")
+
+    print(f"\n{'='*70}")
 
 
 if __name__ == "__main__":
-    # Execução direta: ingere todos os documentos e exibe resumo
-    docs = load_all_documents()
-    for d in docs:
-        print_document_summary(d)
+    chunks = load_sections()
+    print_sections_summary(chunks)

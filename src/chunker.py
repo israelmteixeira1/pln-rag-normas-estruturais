@@ -1,29 +1,16 @@
 """
 src/chunker.py
 ==============
-Módulo de chunking hierárquico para o corpus normativo.
+Módulo de chunking para o corpus normativo NBR 6120.
 
-Estratégia de segmentação
---------------------------
-Normas técnicas ABNT têm estrutura hierárquica rígida:
-    Capítulo > Seção > Item > Tabela/Figura
+Estratégia simplificada
+------------------------
+Cada seção Markdown já é um chunk semântico. Não há subdivisão adicional.
+As seções foram divididas manualmente pelo script
+``scripts/split_nbr6120_sections.py`` para garantir qualidade semântica.
 
-Escolha de parâmetros (justificativa técnica)
-----------------------------------------------
-- chunk_size = 800 caracteres:
-    Uma tabela típica de NBR 6120 (cargas acidentais) ocupa ~400–600 chars.
-    Com 800 chars capturamos a tabela + o parágrafo normativo que a precede,
-    evitando que valores numéricos percam a condição de aplicação (p.ex.
-    "kN/m²" sem saber que se refere a "garagem veículos leves").
-
-- chunk_overlap = 120 caracteres:
-    Equivale a ~1–2 linhas de texto normativo. Garante que uma sentença
-    cortada no final de um chunk apareça no início do próximo, preservando
-    continuidade de enumerações (ex.: itens "a)", "b)", "c)") e condições
-    compostas ("deve ser verificado… quando…").
-
-- Separadores: ["\n\n", "\n", ". ", " "] — prioriza quebras naturais do
-    documento antes de cortar no meio de uma frase.
+O chunker apenas repassa as seções carregadas pelo ``ingestion.py``,
+adicionando estatísticas e utilitários de inspeção.
 """
 
 from __future__ import annotations
@@ -31,173 +18,40 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
 # ---------------------------------------------------------------------------
-# Parâmetros de chunking (justificados no docstring do módulo)
+# Constantes (mantidas para compatibilidade com o restante do pipeline)
 # ---------------------------------------------------------------------------
-CHUNK_SIZE = 800       # caracteres
-CHUNK_OVERLAP = 120    # caracteres
-
-# ---------------------------------------------------------------------------
-# Regex para detectar o número de seção normativa em um bloco de texto
-# Ex.: "4.2.3 Ações variáveis"  →  grupo 1: "4.2.3"
-# ---------------------------------------------------------------------------
-_SECTION_RE = re.compile(
-    r"(?:^|\n)\s*(\d{1,2}(?:\.\d{1,3}){0,4})\s+[A-ZÁÀÂÃÉÊÍÓÔÕÚÜÇ]",
-    re.MULTILINE,
-)
+CHUNK_SIZE = 800       # referência — não usado para subdivisão aqui
+CHUNK_OVERLAP = 120    # referência — não usado para subdivisão aqui
 
 
-def _detect_section(text: str) -> str:
-    """
-    Extrai o número de seção normativa mais específico presente no texto.
-
-    Percorre todo o texto em busca do último padrão ``N.N.N`` seguido de
-    letra maiúscula (início de título normativo). Retornar o *último*
-    (em vez do primeiro) garante que capturamos a seção mais específica
-    do chunk, já que o texto está ordenado cronologicamente.
-
-    Parâmetros
-    ----------
-    text : str
-        Conteúdo textual do chunk.
-
-    Retorna
-    -------
-    str
-        Número da seção (ex.: '4.2.3') ou 'intro' se não encontrado.
-    """
-    matches = _SECTION_RE.findall(text)
-    if matches:
-        return matches[-1]  # usa o número de seção mais específico encontrado
-    return "intro"
-
-
-def _make_chunk_id(doc_id: str, section: str, seq: int) -> str:
-    """
-    Gera um ID único e rastreável para o chunk.
-
-    Formato: ``{doc_id}#{section}_{seq:04d}``
-
-    Exemplos
-    --------
-    - ``NBR6120#3.2_0012``
-    - ``NBR6118#intro_0001``
-    - ``NBR6123#5.1.2_0034``
-
-    Parâmetros
-    ----------
-    doc_id : str
-        Identificador do documento de origem (ex.: 'NBR6120').
-    section : str
-        Número de seção detectado (ex.: '3.2') ou 'intro'.
-    seq : int
-        Número sequencial global do chunk dentro do documento.
-
-    Retorna
-    -------
-    str
-        ID único do chunk.
-    """
-    return f"{doc_id}#{section}_{seq:04d}"
-
-
-def chunk_document(
-    doc: dict[str, Any],
-    chunk_size: int = CHUNK_SIZE,
-    chunk_overlap: int = CHUNK_OVERLAP,
+def chunk_sections(
+    sections: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     """
-    Segmenta um documento normativo em chunks hierárquicos rastreáveis.
+    Recebe as seções do ingestion e as retorna como chunks prontos.
 
-    Cada chunk herda os metadados do documento de origem e recebe:
-    - ``chunk_id``  : ID único no formato ``NBRxxxx#secao_NNNN``
-    - ``secao``     : número de seção normativa detectado no chunk
-    - ``n_chars``   : tamanho do chunk em caracteres
+    Cada seção Markdown é um chunk semântico. Não há subdivisão.
 
     Parâmetros
     ----------
-    doc : dict
-        Dicionário retornado por ``ingestion.load_document()``, com ao
-        menos as chaves: ``doc_id``, ``titulo``, ``fonte``, ``edicao``,
-        ``full_text``.
-    chunk_size : int
-        Tamanho máximo de cada chunk em caracteres (padrão: 800).
-    chunk_overlap : int
-        Sobreposição entre chunks consecutivos em caracteres (padrão: 120).
+    sections : list[dict]
+        Lista de seções retornadas por ``ingestion.load_sections()``.
 
     Retorna
     -------
     list[dict]
-        Lista de chunks, cada um com as chaves:
-        ``chunk_id``, ``doc_id``, ``titulo``, ``fonte``, ``edicao``,
-        ``secao``, ``texto``, ``n_chars``.
+        Lista de chunks (idêntica às seções, para compatibilidade).
     """
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        separators=["\n\n", "\n", ". ", " ", ""],
-        length_function=len,
+    chunks = sections  # cada seção já é um chunk
+
+    print(
+        f"[chunker] NBR6120: {len(chunks)} chunks "
+        f"(1 chunk por seção)"
     )
-
-    raw_chunks = splitter.split_text(doc["full_text"])
-
-    chunks: list[dict[str, Any]] = []
-    for seq, text in enumerate(raw_chunks, start=1):
-        section = _detect_section(text)
-        chunk_id = _make_chunk_id(doc["doc_id"], section, seq)
-
-        chunks.append(
-            {
-                "chunk_id": chunk_id,
-                "doc_id": doc["doc_id"],
-                "titulo": doc["titulo"],
-                "fonte": doc["fonte"],
-                "edicao": doc["edicao"],
-                "secao": section,
-                "texto": text.strip(),
-                "n_chars": len(text.strip()),
-            }
-        )
+    print(f"[chunker] Total: {len(chunks)} chunks gerados.")
 
     return chunks
-
-
-def chunk_documents(
-    docs: list[dict[str, Any]],
-    chunk_size: int = CHUNK_SIZE,
-    chunk_overlap: int = CHUNK_OVERLAP,
-) -> list[dict[str, Any]]:
-    """
-    Segmenta uma lista de documentos normativos.
-
-    Parâmetros
-    ----------
-    docs : list[dict]
-        Lista de documentos retornados por ``ingestion.load_all_documents()``.
-    chunk_size : int
-        Tamanho máximo de cada chunk em caracteres.
-    chunk_overlap : int
-        Sobreposição entre chunks consecutivos em caracteres.
-
-    Retorna
-    -------
-    list[dict]
-        Lista consolidada de todos os chunks de todos os documentos.
-    """
-    all_chunks: list[dict[str, Any]] = []
-
-    for doc in docs:
-        doc_chunks = chunk_document(doc, chunk_size, chunk_overlap)
-        all_chunks.extend(doc_chunks)
-        print(
-            f"[chunker] {doc['doc_id']}: {len(doc_chunks)} chunks "
-            f"(size={chunk_size}, overlap={chunk_overlap})"
-        )
-
-    print(f"\n[chunker] Total: {len(all_chunks)} chunks gerados.")
-    return all_chunks
 
 
 # ---------------------------------------------------------------------------
@@ -209,10 +63,6 @@ def print_chunks_stats(chunks: list[dict[str, Any]]) -> None:
     import statistics
 
     sizes = [c["n_chars"] for c in chunks]
-    docs = {}
-    for c in chunks:
-        docs.setdefault(c["doc_id"], 0)
-        docs[c["doc_id"]] += 1
 
     print(f"\n{'='*60}")
     print("  ESTATÍSTICAS DOS CHUNKS")
@@ -222,27 +72,26 @@ def print_chunks_stats(chunks: list[dict[str, Any]]) -> None:
     print(f"  Tamanho mediano : {statistics.median(sizes):.0f} chars")
     print(f"  Mínimo          : {min(sizes)} chars")
     print(f"  Máximo          : {max(sizes)} chars")
-    print(f"\n  Por documento:")
-    for doc_id, count in sorted(docs.items()):
-        print(f"    {doc_id}: {count} chunks")
     print(f"{'='*60}")
+
+    print("\n  Detalhamento:")
+    for c in chunks:
+        print(f"    {c['chunk_id']:40s} {c['n_chars']:5d} chars")
 
 
 def find_table_chunks(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
-    Filtra chunks que contêm marcadores de tabela ``[TABELA]``.
+    Filtra chunks que contêm tabelas Markdown.
 
-    Útil para verificar se tabelas normativas foram preservadas com
-    contexto suficiente.
+    Útil para verificar se tabelas normativas foram preservadas.
     """
-    return [c for c in chunks if "[TABELA]" in c["texto"]]
+    return [c for c in chunks if "|" in c["texto"] and "---" in c["texto"]]
 
 
 if __name__ == "__main__":
-    from src.ingestion import load_all_documents
+    from src.ingestion import load_sections
 
-    docs = load_all_documents()
-    chunks = chunk_documents(docs)
+    chunks = chunk_sections(load_sections())
     print_chunks_stats(chunks)
 
     table_chunks = find_table_chunks(chunks)
@@ -250,4 +99,4 @@ if __name__ == "__main__":
     if table_chunks:
         print("\nExemplo de chunk com tabela:")
         print(f"  chunk_id: {table_chunks[0]['chunk_id']}")
-        print(f"  texto (primeiros 400 chars):\n{table_chunks[0]['texto'][:400]}")
+        print(f"  texto_md (primeiros 500 chars):\n{table_chunks[0]['texto_md'][:500]}")

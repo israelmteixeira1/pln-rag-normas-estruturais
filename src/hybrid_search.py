@@ -8,18 +8,6 @@ Algoritmo RRF:
     onde rank_retriever é a posição no ranking de cada retriever.
 
 Interface idêntica a indexer.retrieve() para compatibilidade com rag_pipeline.py.
-
-Tokenização léxica (v2)
------------------------
-Utiliza pipeline de normalização otimizado para textos técnicos em
-português brasileiro:
-1. Remoção de acentos via ``unidecode`` (escritório → escritorio)
-2. Stemming via ``RSLPStemmer`` (escritórios → escritori)
-3. Remoção de stopwords em português (de, para, que, com…)
-4. Filtragem de tokens curtos (≤2 caracteres)
-
-Isso melhora significativamente a recuperação léxica de termos técnicos
-como "concreto/concretagem", "protendido/protensão", "cargas/carga".
 """
 
 from __future__ import annotations
@@ -29,89 +17,14 @@ from typing import Any
 
 import numpy as np
 from rank_bm25 import BM25Okapi
-from unidecode import unidecode
-
-# ---------------------------------------------------------------------------
-# Stemmer PT-BR (RSLP — Removedor de Sufixos da Língua Portuguesa)
-# ---------------------------------------------------------------------------
-import nltk
-
-# Garante que o recurso esteja disponível (download silencioso, idempotente)
-nltk.download("rslp", quiet=True)
-
-from nltk.stem import RSLPStemmer
-
-_stemmer = RSLPStemmer()
-
-# ---------------------------------------------------------------------------
-# Stopwords PT-BR (lista compacta — termos gramaticais sem valor semântico)
-# ---------------------------------------------------------------------------
-_STOPWORDS_PT = frozenset({
-    "a", "ao", "aos", "as", "ate", "com", "como", "da", "das", "de",
-    "del", "do", "dos", "e", "eh", "ela", "elas", "ele", "eles", "em",
-    "entre", "era", "essa", "essas", "esse", "esses", "esta", "estas",
-    "este", "estes", "eu", "foi", "for", "foram", "ha", "isso", "isto",
-    "ja", "la", "lhe", "lhes", "lo", "mas", "me", "mesmo", "meu", "minha",
-    "na", "nao", "nas", "nem", "no", "nos", "nós", "num", "numa", "o",
-    "os", "ou", "para", "pela", "pelas", "pelo", "pelos", "per", "pode",
-    "por", "qual", "quando", "que", "quem", "sao", "se", "sem", "ser",
-    "sera", "seu", "sua", "suas", "seus", "so", "sob", "sobre", "tambem",
-    "te", "tem", "ter", "tu", "tua", "tudo", "um", "uma", "umas", "uns",
-    "vai", "vos",
-})
 
 # RRF constant (standard value)
 _RRF_K = 60
 
 
 def _tokenize(text: str) -> list[str]:
-    """
-    Tokeniza texto com normalização otimizada para PT-BR técnico.
-
-    Pipeline:
-    1. Minúsculas
-    2. Divisão por caracteres não-alfanuméricos (mantendo acentos)
-    3. Remoção de stopwords PT-BR
-    4. Stemming RSLP (aplicado com os acentos preservados)
-    5. Remoção de acentos (``unidecode``)
-    6. Filtragem de tokens ≤2 caracteres
-
-    Parâmetros
-    ----------
-    text : str
-        Texto bruto a tokenizar.
-
-    Retorna
-    -------
-    list[str]
-        Lista de tokens normalizados.
-    """
-    # 1. Minúsculas
-    lowered = text.lower()
-    # 2. Divisão em tokens alfanuméricos
-    raw_tokens = re.split(r"\W+", lowered)
-    
-    tokens = []
-    for tok in raw_tokens:
-        if not tok:
-            continue
-            
-        # 3. Stopwords check (usando com e sem acento)
-        tok_no_accent = unidecode(tok)
-        if tok in _STOPWORDS_PT or tok_no_accent in _STOPWORDS_PT:
-            continue
-            
-        # 4. Stemming com RSLP (que depende dos acentos)
-        stemmed = _stemmer.stem(tok)
-        
-        # 5. Remoção de acentos no resultado do stem
-        final_tok = unidecode(stemmed)
-        
-        # 6. Filtro de tamanho
-        if len(final_tok) > 2:
-            tokens.append(final_tok)
-            
-    return tokens
+    """Tokeniza texto: minúsculas, divide em tokens alfanuméricos."""
+    return [tok for tok in re.split(r"\W+", text.lower()) if tok]
 
 
 class SparseRetriever:

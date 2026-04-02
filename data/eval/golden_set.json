@@ -3,159 +3,157 @@
     "id": 1,
     "pergunta": "Qual o valor típico de carga acidental para um pavimento de escritório?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6120#Tabela_X",
-    "comentario": "Busca valor numérico específico na NBR 6120."
+    "evidencia_esperada": "NBR6120#91_62_cargas_variáveis",
+    "comentario": "Tabela 10 — Escritórios (salas de uso geral): 2 kN/m² (§ 6.2, NBR 6120:2019)."
   },
   {
     "id": 2,
     "pergunta": "Qual o valor de carga acidental para uma garagem de veículos leves?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6120#Tabela_Y",
-    "comentario": "Verifica precisão em tabelas de cargas acidentais."
+    "evidencia_esperada": "NBR6120#98_661_ações_em_garagens_e_demais_áreas_de_circulação_de_veícul",
+    "comentario": "§ 6.6.1 — categorias de projeto de garagens definidas pela Tabela 13 em função do PBT e da altura livre de acesso (NBR 6120:2019)."
   },
   {
     "id": 3,
-    "pergunta": "Quando é permitido reduzir as cargas acidentais em um edifício?",
+    "pergunta": "O peso próprio da estrutura deve ser considerado como que tipo de carga?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6120#Reducao_Cargas",
-    "comentario": "Busca por condições normativas de alívio de carga."
+    "evidencia_esperada": "NBR6120#29_ações_permanentes",
+    "comentario": "§ 3.9 — ações permanentes incluem o peso próprio da estrutura e demais elementos construtivos (NBR 6120:2019)."
   },
   {
     "id": 4,
-    "pergunta": "O peso próprio da estrutura deve ser considerado como que tipo de ação?",
+    "pergunta": "Como tratar paredes divisórias cuja posição não é definida no projeto?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6120#Acoes_Permanentes",
-    "comentario": "Conceito básico de ações permanentes."
+    "evidencia_esperada": "NBR6120#93_tabela_10_conclusão",
+    "comentario": "Tabela 11 — carga variável adicional entre 0,5 e 1,0 kN/m² conforme o peso próprio da parede acabada; paredes > 3,0 kN/m não são permitidas (§ 6.2, NBR 6120:2019)."
   },
   {
     "id": 5,
-    "pergunta": "Como estimar o peso específico de um material que não está tabelado?",
+    "pergunta": "Qual o peso específico do concreto armado?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6120#Metodologia_Estimativa",
-    "comentario": "Verifica instrução normativa para materiais genéricos."
+    "evidencia_esperada": "NBR6120#84_53_peso_específico_dos_materiais_de_construção",
+    "comentario": "Tabela 1 — Concreto armado: 25 kN/m³ (§ 5.3, NBR 6120:2019)."
   },
   {
     "id": 6,
-    "pergunta": "Em uma cobertura acessível, qual tipo de carga variável deve ser considerada?",
+    "pergunta": "Qual a carga que deve ser considerada ao longo de parapeitos e balcões?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6120#Coberturas",
-    "comentario": "Diferenciação entre tipos de uso de cobertura."
+    "evidencia_esperada": "NBR6120#94_63_forças_horizontais_variáveis",
+    "comentario": "§ 6.3 + Tabela 12 — forças horizontais em guarda-corpos e barreiras destinadas à proteção de pessoas (NBR 6120:2019)."
   },
   {
     "id": 7,
-    "pergunta": "Em uma cobertura não acessível, ainda é necessário considerar carga variável?",
+    "pergunta": "Quais critérios determinam a categoria de projeto para garagens e áreas de circulação de veículos?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6120#Coberturas_Nao_Acessiveis",
-    "comentario": "Validação de valores mínimos de manutenção."
+    "evidencia_esperada": "NBR6120#98_661_ações_em_garagens_e_demais_áreas_de_circulação_de_veícul",
+    "comentario": "§ 6.6.1 — categoria definida em função da altura livre de acesso e do PBT (Tabela 13); usuário pode projetar para categorias diferentes com controle de acesso (NBR 6120:2019)."
   },
   {
     "id": 8,
-    "pergunta": "Como considerar a presença de paredes divisórias que não têm posição definida em projeto?",
+    "pergunta": "Qual a carga variável mínima a considerar em coberturas com acesso apenas para manutenção?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6120#Divisorias_Moveis",
-    "comentario": "Cálculo de carga linear equivalente ou distribuída."
+    "evidencia_esperada": "NBR6120#95_64_cargas_variáveis_em_coberturas",
+    "comentario": "§ 6.4 — cargas variáveis em coberturas com acesso restrito à manutenção (NBR 6120:2019)."
   },
   {
     "id": 9,
-    "pergunta": "Qual a diferença entre carga distribuída e carga concentrada no dimensionamento?",
-    "categoria": "multi_trecho",
-    "evidencia_esperada": [
-      "NBR6120#Definicoes",
-      "NBR6118#Dimensionamento"
-    ],
-    "comentario": "Exige síntese entre definições de carga e aplicação estrutural."
+    "pergunta": "Quando é permitido reduzir as cargas acidentais em um edifício?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6120#106_612_redução_de_cargas_variáveis",
+    "comentario": "§ 6.12 — redução aplicável a pilares e fundações que suportem n andares com o mesmo tipo de uso, por meio do coeficiente α_n da Tabela 19 (NBR 6120:2019)."
   },
   {
     "id": 10,
-    "pergunta": "Como determinar a velocidade básica do vento em uma região?",
-    "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6123#Isopletas",
-    "comentario": "Uso de mapas de isopletas (Velocidade $V_0$)."
+    "pergunta": "Qual a redução percentual de cargas acidentais quando há 6 ou mais pisos?",
+    "categoria": "multi_trecho",
+    "evidencia_esperada": [
+      "NBR6120#106_612_redução_de_cargas_variáveis"
+    ],
+    "comentario": "§ 6.12 + Tabela 19 — α_n = 0,6 para 6 ou mais pisos (redução de 40%); tabela e regra de aplicação estão na mesma seção (NBR 6120:2019)."
   },
   {
     "id": 11,
-    "pergunta": "Quais fatores influenciam a velocidade de cálculo do vento além da velocidade básica?",
+    "pergunta": "Como é definida a velocidade básica do vento V0 pela NBR 6123?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6123#Fatores_S1_S2_S3",
-    "comentario": "Identificação dos fatores topográfico, rugosidade e estatístico."
+    "evidencia_esperada": "NBR6123#52_51_velocidade_básica_do_vento_v0",
+    "comentario": "§ 5.1 — rajada de 3 s, a 10 m de altura, campo aberto e plano, excedida uma vez em 50 anos."
   },
   {
     "id": 12,
-    "pergunta": "Qual a diferença entre pressão positiva e sucção do vento em uma edificação?",
+    "pergunta": "O que é a pressão dinâmica do vento e como é calculada?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6123#Coeficientes_Pressao",
-    "comentario": "Conceito de pressão externa e interna."
+    "evidencia_esperada": "NBR6123#46_42_pressão_dinâmica",
+    "comentario": "§ 4.2 — q = 0,613 Vk², onde Vk é a velocidade característica (m/s)."
   },
   {
     "id": 13,
-    "pergunta": "Como considerar o efeito do vento no interior de uma edificação?",
-    "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6123#Pressao_Interna",
-    "comentario": "Cálculo de permeabilidade e aberturas."
+    "pergunta": "Quais são os três fatores que multiplicam V0 para obter a velocidade característica Vk?",
+    "categoria": "multi_trecho",
+    "evidencia_esperada": [
+      "NBR6123#46_42_pressão_dinâmica",
+      "NBR6123#53_52_fator_topográfico_s1",
+      "NBR6123#54_53_rugosidade_do_terreno_dimensões_da_edificação_estrutura_o",
+      "NBR6123#58_54_fator_estatístico_s3"
+    ],
+    "comentario": "§ 4.2 + 5.2 a 5.4 — fatores S1 (topográfico), S2 (rugosidade/altura/dimensões) e S3 (estatístico)."
   },
   {
     "id": 14,
-    "pergunta": "Em quais situações é necessário realizar estudos específicos (como túnel de vento)?",
+    "pergunta": "O que considera o fator topográfico S1 no cálculo do vento?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6123#Ensaios_Modelo_Reduzido",
-    "comentario": "Critérios de esbeltez e geometria complexa."
+    "evidencia_esperada": "NBR6123#53_52_fator_topográfico_s1",
+    "comentario": "§ 5.2 — variações do relevo do terreno (plano: S1=1,0; taludes/morros/vales: fórmulas específicas)."
   },
   {
     "id": 15,
-    "pergunta": "O que caracteriza uma ação permanente indireta?",
+    "pergunta": "O que considera o fator S2 no cálculo da velocidade do vento?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6118#Acoes_Permanentes_Indiretas",
-    "comentario": "Conceitos como recalques de apoio e retração."
+    "evidencia_esperada": "NBR6123#54_53_rugosidade_do_terreno_dimensões_da_edificação_estrutura_o",
+    "comentario": "§ 5.3 — efeito combinado da rugosidade do terreno, variação da velocidade com a altura e dimensões da edificação."
   },
   {
     "id": 16,
-    "pergunta": "Como a retração do concreto deve ser considerada no projeto estrutural?",
-    "categoria": "multi_trecho",
-    "evidencia_esperada": [
-      "NBR6118#Retracao",
-      "NBR6118#Efeitos_Termicos"
-    ],
-    "comentario": "Exige combinar causas e formas de cálculo."
+    "pergunta": "Para uma residência normal, qual o valor mínimo do fator estatístico S3?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#58_54_fator_estatístico_s3",
+    "comentario": "§ 5.4 Tabela 4 — Grupo 3 (residências, hotéis, comércio): S3 = 1,00 (Tp = 50 anos)."
   },
   {
     "id": 17,
-    "pergunta": "Qual a diferença entre estados-limite últimos e estados-limite de serviço?",
-    "categoria": "multi_trecho",
-    "evidencia_esperada": [
-      "NBR6118#ELU",
-      "NBR6118#ELS"
-    ],
-    "comentario": "Diferenciação entre segurança estrutural e conforto/durabilidade."
+    "pergunta": "O que são sobrepressão e sucção no contexto dos coeficientes de pressão do vento?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#48_431_coeficientes_de_pressão",
+    "comentario": "§ 4.3.1 — valores positivos correspondem a sobrepressões; valores negativos correspondem a sucções."
   },
   {
     "id": 18,
-    "pergunta": "Em uma combinação de ações, qual tipo de carregamento geralmente entra como ação principal?",
+    "pergunta": "Como é considerada a pressão interna do vento em edificações com aberturas?",
     "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6118#Combinacoes",
-    "comentario": "Regras de majoração e simultaneidade."
+    "evidencia_esperada": "NBR6123#81_631_conceitos_gerais",
+    "comentario": "§ 6.3.1 — pressão interna depende do índice de permeabilidade e da posição das aberturas."
   },
   {
     "id": 19,
-    "pergunta": "Quando o vento pode se tornar a ação dominante no dimensionamento?",
-    "categoria": "multi_trecho",
-    "evidencia_esperada": [
-      "NBR6123#Esbeltez",
-      "NBR6118#Estabilidade_Global"
-    ],
-    "comentario": "Análise de sensibilidade a cargas horizontais."
+    "pergunta": "Em que situações a NBR 6123 indica o uso de ensaios em túnel de vento?",
+    "categoria": "factual_direta",
+    "evidencia_esperada": "NBR6123#14_1_escopo",
+    "comentario": "§ 1 Nota 4 — formas e dimensões não contempladas pela norma ou condições de vizinhança especiais."
   },
   {
     "id": 20,
-    "pergunta": "Em estruturas altas e esbeltas, por que a análise puramente estática pode não ser suficiente?",
-    "categoria": "factual_direta",
-    "evidencia_esperada": "NBR6123#Efeitos_Dinamicos",
-    "comentario": "Necessidade de análise dinâmica (ressonância e rajadas)."
+    "pergunta": "Quando estruturas altas e esbeltas precisam considerar análise dinâmica além da análise estática?",
+    "categoria": "multi_trecho",
+    "evidencia_esperada": [
+      "NBR6123#114_91_considerações_gerais",
+      "NBR6123#45_41_orientações_gerais"
+    ],
+    "comentario": "§ 9.1 + 4.1 — quando período fundamental T1 > 1 s (estruturas fracamente amortecidas)."
   },
   {
     "id": 21,
     "pergunta": "Como calcular o preço do m³ de concreto para uma obra em Brasília?",
     "categoria": "fora_do_corpus",
     "evidencia_esperada": null,
-    "comentario": "Teste de recusa adequada (não é tema normativo)[cite: 91, 101]."
+    "comentario": "Teste de recusa adequada — não é tema normativo coberto pelo corpus."
   }
 ]

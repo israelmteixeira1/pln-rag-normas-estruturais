@@ -4,16 +4,21 @@ __pycache__/
 *.pyo
 
 # Jupyter
-# .ipynb_checkpoints/
-
-# Índice e artefatos gerados pelo notebook
-# index/
+.ipynb_checkpoints/
 
 # Ambiente
 .venv/
 venv/
 .env
 
-# Git worktrees
+# Dados brutos não usados (normas legadas)
+data/norms/chunks/
+data/norms/md/NBR6118_2023.md
+data/norms/md/NBR6123_2023.md
+
+# Planos internos Claude Code
+docs/superpowers/
+
+# Git worktrees / macOS
 .worktrees/
 .DS_Store

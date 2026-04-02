@@ -116,7 +116,7 @@ def format_context(results: list[dict[str, Any]]) -> str:
             f"[Fonte: {r['doc_id']} — {secao_label} | "
             f"Relevância: {r['score']:.3f}]"
         )
-        parts.append(f"{header}\n{r['texto']}")
+        parts.append(f"{header}\n{r.get('texto_md', r['texto'])}")
     return "\n\n---\n\n".join(parts)
 
 
@@ -144,8 +144,8 @@ def build_prompt(
         Prompt completo pronto para envio ao LLM.
     """
     system = (
-        SYSTEM_PROMPT_BASELINE if mode == "baseline"
-        else SYSTEM_PROMPT_IMPROVED
+        SYSTEM_PROMPT_IMPROVED if mode == "improved"
+        else SYSTEM_PROMPT_BASELINE  # dense, sparse, hybrid, baseline
     )
 
     return (
