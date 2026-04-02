@@ -229,41 +229,41 @@ Avaliação de 17 perguntas do golden set nos três modos de retrieval (dense / 
 
 **Ficheiro de detalhe completo:** `data/eval/rubrica_detalhada.md` — contém as respostas integrais dos 3 modos + tabela de preenchimento por questão.
 
-**Automação:** a coluna *Faithfulness* foi calculada via **RAGAS** (Groq llama-4-scout como LLM-judge). Mede o grau em que as afirmações da resposta têm suporte nos trechos recuperados (0–1). Scores completos para os 3 modos em `data/eval/ragas_scores.json`.
+**Automação:** a coluna _Faithfulness_ foi calculada via **RAGAS** (Groq llama-4-scout como LLM-judge). Mede o grau em que as afirmações da resposta têm suporte nos trechos recuperados (0–1). Scores completos para os 3 modos em `data/eval/ragas_scores.json`.
 
 > ⚠ **Limitação conhecida do RAGAS para recusas:** quando o pipeline responde "Não encontrei informação suficiente", o RAGAS atribui Faithfulness ≈ 0 (a expressão de recusa não aparece literalmente nos chunks). Isso **não indica alucinação** — indica apenas que a recusa é uma decisão do LLM, não uma inferência extraída dos trechos.
 
 #### Critérios
 
-| Critério | Escala | Preenchimento |
-| --- | --- | --- |
-| **Faithfulness** (RAGAS) | 0–1: afirmações suportadas pelos chunks | Automático |
-| **Correção** | 0–2: 0=incorreta · 1=parcial · 2=correta conforme a norma | **Marcelo** |
-| **Recusa** | 0=deveria responder · 1=recusa correta · N/A=respondeu | **Marcelo** |
+| Critério                 | Escala                                                    | Preenchimento |
+| ------------------------ | --------------------------------------------------------- | ------------- |
+| **Faithfulness** (RAGAS) | 0–1: afirmações suportadas pelos chunks                   | Automático    |
+| **Correção**             | 0–2: 0=incorreta · 1=parcial · 2=correta conforme a norma | **Marcelo**   |
+| **Recusa**               | 0=deveria responder · 1=recusa correta · N/A=respondeu    | **Marcelo**   |
 
 #### Tabela de scores — modo dense (baseline)
 
 > **Marcelo:** preencha as colunas **Correção** e **Recusa** abaixo. O símbolo `_` indica célula a preencher. Consulte `data/eval/rubrica_detalhada.md` para ver a resposta completa e os chunks recuperados.
 
-| # | Pergunta (resumo) | Cat | Hit? | Faith Dense | Faith Sparse | Faith Hybrid | **Correção** | **Recusa** |
-| --- | --- | --- | :---: | :---: | :---: | :---: | --- | --- |
-| Q1 | Carga acidental em escritório (kN/m²)? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
-| Q2 | Carga acidental garagem veículos leves? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
-| Q3 | Peso próprio = que tipo de carga? | fact | ✗ | 0,50 | 1,00 | 0,67 | _ | N/A |
-| Q4 | Paredes divisórias sem posição — como tratar? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
-| Q5 | Peso específico do concreto armado? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
-| Q6 | Carga ao longo de parapeitos e balcões? | fact | ✗ | **1,00** | 0,75 | **1,00** | _ | N/A |
-| Q7 | Critérios categoria projeto para garagens? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
-| Q8 | Carga mínima em coberturas (manutenção)? | fact | ✗ | 0,00 | 0,86 | 0,83 | _ | _ |
-| Q9 | Quando reduzir cargas acidentais? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
-| Q10 | Redução percentual — 6 ou mais pisos? | multi | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
-| Q11 | Definição velocidade básica V0? | fact | ✓ | **1,00** | **1,00** | 0,80 | _ | N/A |
-| Q12 | Pressão dinâmica do vento — definição e cálculo? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
-| Q13 | Três fatores S1, S2, S3 para calcular Vk? | multi | ✗ | 0,83 | **1,00** | 0,25 ⚠ | _ | N/A |
-| Q14 | O que considera o fator topográfico S1? | fact | ✗ | 0,00 | 1,00 | 1,00 | _ | _ |
-| Q15 | O que considera o fator S2? | fact | ✗ | N/D | **1,00** | N/D | _ | N/A |
-| Q16 | Valor mínimo do fator S3 para residências? | fact | ✗ | 0,00 | 0,67 | 0,67 | _ | _ |
-| Q21 | Preço m³ concreto para obra em Brasília? | fora | — | 0,00 ¹ | 0,00 ¹ | 0,00 ¹ | — | **1 ✓** |
+| #   | Pergunta (resumo)                                | Cat   | Hit? | Faith Dense | Faith Sparse | Faith Hybrid | **Correção** | **Recusa** |
+| --- | ------------------------------------------------ | ----- | :--: | :---------: | :----------: | :----------: | ------------ | ---------- |
+| Q1  | Carga acidental em escritório (kN/m²)?           | fact  |  ✗   |    0,00     |     1,00     |     1,00     | \_           | \_         |
+| Q2  | Carga acidental garagem veículos leves?          | fact  |  ✗   |    0,00     |     1,00     |     1,00     | \_           | \_         |
+| Q3  | Peso próprio = que tipo de carga?                | fact  |  ✗   |    0,50     |     1,00     |     0,67     | \_           | N/A        |
+| Q4  | Paredes divisórias sem posição — como tratar?    | fact  |  ✗   |    0,00     |     1,00     |     1,00     | \_           | \_         |
+| Q5  | Peso específico do concreto armado?              | fact  |  ✗   |    0,00     |     1,00     |     1,00     | \_           | \_         |
+| Q6  | Carga ao longo de parapeitos e balcões?          | fact  |  ✗   |  **1,00**   |     0,75     |   **1,00**   | \_           | N/A        |
+| Q7  | Critérios categoria projeto para garagens?       | fact  |  ✗   |    0,00     |     1,00     |     1,00     | \_           | \_         |
+| Q8  | Carga mínima em coberturas (manutenção)?         | fact  |  ✗   |    0,00     |     0,86     |     0,83     | \_           | \_         |
+| Q9  | Quando reduzir cargas acidentais?                | fact  |  ✗   |    0,00     |     1,00     |     1,00     | \_           | \_         |
+| Q10 | Redução percentual — 6 ou mais pisos?            | multi |  ✗   |    0,00     |     1,00     |     1,00     | \_           | \_         |
+| Q11 | Definição velocidade básica V0?                  | fact  |  ✓   |  **1,00**   |   **1,00**   |     0,80     | \_           | N/A        |
+| Q12 | Pressão dinâmica do vento — definição e cálculo? | fact  |  ✗   |    0,00     |     1,00     |     1,00     | \_           | \_         |
+| Q13 | Três fatores S1, S2, S3 para calcular Vk?        | multi |  ✗   |    0,83     |   **1,00**   |    0,25 ⚠    | \_           | N/A        |
+| Q14 | O que considera o fator topográfico S1?          | fact  |  ✗   |    0,00     |     1,00     |     1,00     | \_           | \_         |
+| Q15 | O que considera o fator S2?                      | fact  |  ✗   |     N/D     |   **1,00**   |     N/D      | \_           | N/A        |
+| Q16 | Valor mínimo do fator S3 para residências?       | fact  |  ✗   |    0,00     |     0,67     |     0,67     | \_           | \_         |
+| Q21 | Preço m³ concreto para obra em Brasília?         | fora  |  —   |   0,00 ¹    |    0,00 ¹    |    0,00 ¹    | —            | **1 ✓**    |
 
 _¹ RAGAS marca 0 para Q21 por limitação estrutural (ver nota acima). ⚠ Q13 hybrid: 0,25 indica resposta com baixo grounding — ver Exemplo 3 abaixo._
 
@@ -271,16 +271,16 @@ _¹ RAGAS marca 0 para Q21 por limitação estrutural (ver nota acima). ⚠ Q13 
 
 Para evidenciar o ganho da Trilha A, a tabela abaixo cruza Hit@5 dos três modos:
 
-| # | Pergunta (resumo) | Hit D/S/H | Faith Dense | Faith Sparse | Faith Hybrid |
-| --- | --- | :---: | :---: | :---: | :---: |
-| Q1 | Carga acidental escritório | ✗/✗/✗ | 0,00 | 1,00 | 1,00 |
-| Q2 | Carga garagem veículos leves | ✗/✓/✓ | 0,00 | 1,00 | 1,00 |
-| Q3 | Peso próprio = permanente? | ✗/✓/✓ | 0,50 | 1,00 | 0,67 |
-| Q5 | Peso específico concreto armado | ✗/✓/✓ | 0,00 | 1,00 | 1,00 |
-| Q9 | Redução cargas acidentais — quando? | ✗/✓/✓ | 0,00 | 1,00 | 1,00 |
-| Q11 | Velocidade básica V0 | ✓/✓/✓ | 1,00 | 1,00 | 0,80 |
-| Q12 | Pressão dinâmica do vento | ✗/✓/✓ | 0,00 | 1,00 | 1,00 |
-| Q14 | Fator topográfico S1 | ✗/✓/✓ | 0,00 | 1,00 | 1,00 |
+| #   | Pergunta (resumo)                   | Hit D/S/H | Faith Dense | Faith Sparse | Faith Hybrid |
+| --- | ----------------------------------- | :-------: | :---------: | :----------: | :----------: |
+| Q1  | Carga acidental escritório          |   ✗/✗/✗   |    0,00     |     1,00     |     1,00     |
+| Q2  | Carga garagem veículos leves        |   ✗/✓/✓   |    0,00     |     1,00     |     1,00     |
+| Q3  | Peso próprio = permanente?          |   ✗/✓/✓   |    0,50     |     1,00     |     0,67     |
+| Q5  | Peso específico concreto armado     |   ✗/✓/✓   |    0,00     |     1,00     |     1,00     |
+| Q9  | Redução cargas acidentais — quando? |   ✗/✓/✓   |    0,00     |     1,00     |     1,00     |
+| Q11 | Velocidade básica V0                |   ✓/✓/✓   |    1,00     |     1,00     |     0,80     |
+| Q12 | Pressão dinâmica do vento           |   ✗/✓/✓   |    0,00     |     1,00     |     1,00     |
+| Q14 | Fator topográfico S1                |   ✗/✓/✓   |    0,00     |     1,00     |     1,00     |
 
 **Síntese:** Sparse e Hybrid recuperam o chunk correto em 15–16/20 questões contra 1/20 do Dense. Faithfulness do Sparse ≈ 1,00 na maioria dos casos confirma que, quando o chunk certo é recuperado, o LLM gera respostas bem fundamentadas. Hybrid tem Faithfulness igualmente alta, com exceção de Q13 (0,25) onde a resposta é confusa — ver Exemplo 3.
 
@@ -291,7 +291,7 @@ Para evidenciar o ganho da Trilha A, a tabela abaixo cruza Hit@5 dos três modos
 **Exemplo 1 — Q11: resposta correta (dense e sparse)**
 _"Como é definida a velocidade básica do vento V0 pela NBR 6123?"_
 
-> Dense/Sparse: *"A velocidade básica do vento, V0, é definida como a velocidade de uma rajada de 3 s, a 10 m acima do terreno, em campo aberto e plano, excedida em média uma vez em 50 anos [NBR6123, Seção 5.1]."*
+> Dense/Sparse: _"A velocidade básica do vento, V0, é definida como a velocidade de uma rajada de 3 s, a 10 m acima do terreno, em campo aberto e plano, excedida em média uma vez em 50 anos [NBR6123, Seção 5.1]."_
 
 Faithfulness = 1,00. A definição reproduz fielmente o §5.1 da NBR 6123:2023. Única questão onde o dense também acerta (o nome do chunk `51_velocidade_básica_do_vento_v0` é semânticamente próximo da query).
 
@@ -300,9 +300,9 @@ Faithfulness = 1,00. A definição reproduz fielmente o §5.1 da NBR 6123:2023. 
 **Exemplo 2 — Q2: falha dense, acerto sparse**
 _"Qual o valor de carga acidental para uma garagem de veículos leves?"_
 
-> Dense (Hit ✗): *"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta."*
+> Dense (Hit ✗): _"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta."_
 
-> Sparse (Hit ✓): *"[NBR6120, Seção 6.6.1] A carga acidental para garagem de veículos leves é dada pela Tabela 13 da NBR6120. Considerando veículos leves, a Categoria I é a mais adequada, com as seguintes cargas: Carga uniformemente distribuída: 3 kN/m². Carga concentrada (Qk): 12 kN, atuando em uma região de 10 cm × 10 cm."*
+> Sparse (Hit ✓): _"[NBR6120, Seção 6.6.1] A carga acidental para garagem de veículos leves é dada pela Tabela 13 da NBR6120. Considerando veículos leves, a Categoria I é a mais adequada, com as seguintes cargas: Carga uniformemente distribuída: 3 kN/m². Carga concentrada (Qk): 12 kN, atuando em uma região de 10 cm × 10 cm."_
 
 Ilustra o ganho direto do BM25 sobre o dense: a query contém "garagem" e "veículos leves", termos que o BM25 casou exatamente com `NBR6120#98_661_ações_em_garagens…`. O BERTimbau não fez essa associação semanticamente.
 
@@ -311,7 +311,7 @@ Ilustra o ganho direto do BM25 sobre o dense: a query contém "garagem" e "veíc
 **Exemplo 3 — Q13: resposta parcial com risco de alucinação (dense)**
 _"Quais são os três fatores que multiplicam V0 para obter a velocidade característica Vk?"_
 
-> Dense (Faithfulness = 0,83): *"…S2 é confirmado como um dos fatores. S1 e S3 são mencionados implicitamente como necessários para calcular Vk, mas seus valores ou como são obtidos não estão detalhados na seção A.1 fornecida. (…) SOMENTE S2 é apresentado [NBR6123, Seção A.1 Fator S2]."*
+> Dense (Faithfulness = 0,83): _"…S2 é confirmado como um dos fatores. S1 e S3 são mencionados implicitamente como necessários para calcular Vk, mas seus valores ou como são obtidos não estão detalhados na seção A.1 fornecida. (…) SOMENTE S2 é apresentado [NBR6123, Seção A.1 Fator S2]."_
 
 O LLM menciona a fórmula `Vk = S1·S2·S3·V0` sem encontrá-la nos chunks — potencial alucinação parcial. Sparse (Hit ✓, Faith 1,00) recupera todos os chunks de S1/S2/S3 e responde com precisão. **Marcelo: avaliar se a fórmula citada pelo dense está correta ou é alucinação.**
 
@@ -320,7 +320,7 @@ O LLM menciona a fórmula `Vk = S1·S2·S3·V0` sem encontrá-la nos chunks — 
 **Exemplo 4 — Q21: recusa correta**
 _"Como calcular o preço do m³ de concreto para uma obra em Brasília?"_
 
-> Dense/Sparse: *"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta. (A consulta está limitada a normas técnicas ABNT, e a pergunta envolve tema não normativo, especificamente relacionado a preços e orçamentos.)"*
+> Dense/Sparse: _"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta. (A consulta está limitada a normas técnicas ABNT, e a pergunta envolve tema não normativo, especificamente relacionado a preços e orçamentos.)"_
 
 Recusa correta e bem justificada — o corpus cobre apenas normas de cargas e vento, não precificação. O LLM ainda acrescentou a razão da recusa, o que é um comportamento desejável de grounding. Recusa = 1 ✓.
 
@@ -341,11 +341,3 @@ Recusa correta e bem justificada — o corpus cobre apenas normas de cargas e ve
 **Formulas não decodificadas:** O Docling converte fórmulas matemáticas para `<!-- formula-not-decoded -->` quando não consegue renderizá-las. Isso afeta algumas seções da NBR 6123 que contêm equações.
 
 **Dependência de API externa:** A geração de respostas depende de APIs de LLM (Groq/Gemini). Para uso totalmente local, seria necessário integrar um modelo como `llama.cpp` ou `Ollama`.
-
-### Próximos Passos
-
-1. **Incluir NBR 6118** quando um PDF com encoding correto estiver disponível
-2. **Sub-dividir seções longas** (> 2.000 chars) para melhorar qualidade dos embeddings
-3. **Reranking** (Trilha B) como camada adicional sobre o hybrid retriever
-4. **RAGAS completo** para os 3 modos (interrompido por limite de tokens da API gratuita — executar com tier pago ou OpenAI)
-5. **Interface standalone** (Streamlit ou FastAPI) desacoplada do notebook Jupyter
