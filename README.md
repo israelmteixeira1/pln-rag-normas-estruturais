@@ -11,7 +11,7 @@ Chatbot técnico baseado em **RAG (Retrieval-Augmented Generation)** para consul
 
 | Norma                           | Conteúdo                                           | Seções |
 | ------------------------------- | -------------------------------------------------- | ------ |
-| **NBR 6120:1980** (Errata 2000) | Cargas para o cálculo de estruturas de edificações | 13     |
+| **NBR 6120:2019**               | Cargas para o cálculo de estruturas de edificações | 13     |
 | **NBR 6123:2023**               | Forças devidas ao vento em edificações             | 166    |
 
 **Total:** 179 seções · ~331 k caracteres
@@ -24,7 +24,7 @@ Chatbot técnico baseado em **RAG (Retrieval-Augmented Generation)** para consul
 | `doc_id`   | Documento de origem (`NBR6120` ou `NBR6123`)     |
 | `titulo`   | Título da norma completa                         |
 | `fonte`    | Origem (`ABNT`)                                  |
-| `edicao`   | Edição/data da norma (ex.: `1980 (Errata 2000)`) |
+| `edicao`   | Edição/data da norma (ex.: `2019`)               |
 | `secao`    | Número da seção normativa                        |
 | `summary`  | Resumo gerado na segmentação                     |
 
