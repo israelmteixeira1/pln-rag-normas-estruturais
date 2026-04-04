@@ -11,12 +11,38 @@ Chatbot técnico baseado em **RAG (Retrieval-Augmented Generation)** para consul
 
 | Norma                           | Conteúdo                                           | Seções |
 | ------------------------------- | -------------------------------------------------- | ------ |
-| **NBR 6120:1980** (Errata 2000) | Cargas para o cálculo de estruturas de edificações | 13     |
+| **NBR 6120:2019**               | Cargas para o cálculo de estruturas de edificações | 13     |
 | **NBR 6123:2023**               | Forças devidas ao vento em edificações             | 166    |
 
 **Total:** 179 seções · ~331 k caracteres
 
-A granularidade de segmentação é **1 seção = 1 chunk**. Cada chunk carrega `chunk_id`, `doc_id`, `titulo`, `fonte`, `edicao`, `secao` e `summary`.
+### Metadados por chunk
+
+| Campo      | Descrição                                        |
+| ---------- | ------------------------------------------------ |
+| `chunk_id` | Identificador único (ex.: `NBR6120_secao_3`)     |
+| `doc_id`   | Documento de origem (`NBR6120` ou `NBR6123`)     |
+| `titulo`   | Título da norma completa                         |
+| `fonte`    | Origem (`ABNT`)                                  |
+| `edicao`   | Edição/data da norma (ex.: `2019`)               |
+| `secao`    | Número da seção normativa                        |
+| `summary`  | Resumo gerado na segmentação                     |
+
+### Estratégia de chunking
+
+**Granularidade:** 1 seção normativa = 1 chunk — sem subdivisão adicional.
+
+**Justificativa:** as seções das normas ABNT são unidades semânticas autocontidas — cada uma trata de um tema específico (ex.: cargas de vento por categoria de terreno). Subdividir introduziria fragmentação sem ganho de recall no domínio técnico-normativo.
+
+**Detalhes:**
+
+| Parâmetro              | Valor                                                          |
+| ---------------------- | -------------------------------------------------------------- |
+| Tamanho médio          | ~1.850 chars/chunk (variável por seção)                        |
+| Overlap                | Não aplicado (seções são semanticamente independentes)         |
+| Títulos/cabeçalhos     | Preservados como Markdown (`##`, `###`)                        |
+| Tabelas                | Preservadas em Markdown (ex.: tabelas de coeficientes NBR6123) |
+| Listas e fórmulas      | Preservadas como texto bruto                                   |
 
 ---
 
@@ -29,6 +55,56 @@ Três modos de retrieval disponíveis:
 | `dense`  | BERTimbau + FAISS (baseline) | Busca semântica por cosseno             |
 | `sparse` | BM25Okapi                    | Busca léxica por termos exatos          |
 | `hybrid` | BM25 + FAISS via RRF         | Fusão Reciprocal Rank Fusion (k_RRF=60) |
+
+### Parâmetros dos retrievers
+
+**Dense (BERTimbau + FAISS):**
+- Modelo: `neuralmind/bert-base-portuguese-cased` (dim=768)
+- Índice: `IndexFlatIP` com vetores L2-normalizados (equivale a similaridade de cosseno exata)
+- Justificativa: busca exata (FlatIP) é viável com 179 chunks e garante precisão máxima
+
+**Sparse (BM25):**
+- Implementação: `BM25Okapi` (parâmetros padrão: k1=1.5, b=0.75)
+- Tokenização: lowercase → remoção de diacríticos → stemming RSLP PT-BR
+- Justificativa: termos normativos específicos (ex.: "NBR 6120", "coeficiente de arrasto") se beneficiam de busca exata por token
+
+**Hybrid (RRF):**
+- Candidatos por retriever: `min(k×3, n_chunks)`
+- Fusão: `score(chunk) = Σ 1/(60 + rank)` — score RRF padrão da literatura
+- Deduplicação: via dicionário indexado por posição do chunk — cada chunk aparece uma única vez no resultado final
+- Parâmetro k_RRF=60: valor padrão amplamente adotado, garante suavidade na fusão de rankings
+
+---
+
+## Pipeline RAG com citações
+
+O chatbot executa o pipeline completo:
+
+1. Recebe pergunta do usuário
+2. Recupera top-k chunks via retriever selecionado
+3. Monta prompt com o contexto normativo recuperado
+4. Gera resposta **exclusivamente baseada nos trechos fornecidos**
+5. Retorna resposta com **citações** no formato `[NBRxxxx, Seção Y.Y]`
+
+### Grounding e recusa
+
+O `src/prompts.py` define dois modos de prompt:
+
+| Modo       | Técnicas                                                          |
+| ---------- | ----------------------------------------------------------------- |
+| `baseline` | Grounding obrigatório + formato de citação + recusa explícita     |
+| `improved` | Tudo do baseline + chain-of-thought + verificação cruzada entre normas + formato estruturado |
+
+**Recusa adequada:** quando os trechos recuperados não contêm evidência suficiente, o modelo responde exclusivamente: *"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta."*
+
+**Guardrails:** perguntas fora do domínio normativo (preços, marcas comerciais, orçamentos) são recusadas com explicação.
+
+### Transparência
+
+A interface Gradio (Seção 10 do notebook) exibe:
+- Resposta gerada com citações
+- Trechos normativos recuperados (chunk_id, seção, score de relevância)
+- Modo de retrieval ativo (dense / sparse / hybrid)
 
 ---
 
@@ -140,19 +216,41 @@ Na célula Gradio, troque `demo.launch()` por `demo.launch(share=True)` para URL
 
 ## Avaliação
 
+### Golden set
+
+O arquivo `data/eval/golden_set.json` contém **21 perguntas** distribuídas em três categorias:
+
+| Categoria        | Qtd | Descrição                                           |
+| ---------------- | --- | --------------------------------------------------- |
+| `factual_direta` | 17  | Perguntas com resposta em uma seção específica      |
+| `multi_trecho`   | 3   | Perguntas que exigem combinar 2+ seções             |
+| `fora_do_corpus` | 1   | Pergunta fora do domínio (testa recusa do chatbot)  |
+
+Cada entrada contém a pergunta, os `chunk_ids` relevantes esperados e a categoria.
+
 ### Recall@k (automático)
 
-Execute a Seção 8 do notebook. Calcula Recall@k (k=3, 5, 10) para os 3 modos de retrieval usando o golden set em `data/eval/golden_set.json`.
+Execute a Seção 8 do notebook. Calcula Recall@k (k=3, 5, 10) para os 3 modos de retrieval usando o golden set.
 
 ### Rubrica qualitativa (manual)
 
-Gere as respostas para avaliação manual:
+Gere as respostas para os três modos de retrieval:
 
 ```bash
-python scripts/gerar_rubrica.py
+python scripts/gerar_rubrica.py                          # dense (padrão)
+python scripts/gerar_rubrica.py --retriever sparse       # sparse
+python scripts/gerar_rubrica.py --retriever hybrid       # hybrid
 ```
 
-Preencha os scores em `data/eval/rubrica_scores.json` seguindo o template gerado em `data/eval/rubrica_respostas.json`.
+Os arquivos gerados em `data/eval/`:
+
+| Arquivo                          | Conteúdo                                          |
+| -------------------------------- | ------------------------------------------------- |
+| `rubrica_respostas.json`         | Perguntas + respostas do modo dense               |
+| `rubrica_respostas_sparse.json`  | Perguntas + respostas do modo sparse              |
+| `rubrica_respostas_hybrid.json`  | Perguntas + respostas do modo hybrid              |
+| `rubrica_detalhada.md`           | Análise qualitativa manual completa               |
+| `ragas_scores.json`              | Métricas automáticas RAGAS (faithfulness)         |
 
 **Critérios por resposta:**
 
@@ -166,6 +264,17 @@ Preencha os scores em `data/eval/rubrica_scores.json` seguindo o template gerado
 
 ---
 
+## Entregáveis
+
+| Artefato            | Localização              | Descrição                                          |
+| ------------------- | ------------------------ | -------------------------------------------------- |
+| Repositório         | (este repositório)       | Código, corpus, índice e resultados de avaliação   |
+| Relatório técnico   | `RELATORIO.md`           | Decisões de chunking, retrieval, avaliação, trilha |
+| Apresentação        | `apresentacao.md` / `.pdf` | Slides da apresentação oral                      |
+| Interface           | Notebook Seção 10        | Gradio com citações e trechos recuperados visíveis |
+
+---
+
 ## Estrutura do projeto
 
 ```
@@ -176,17 +285,22 @@ pln-rag-normas-estruturais/
 │   │   ├── NBR6123_2023.pdf
 │   │   ├── md/                        # markdown gerado pelo Docling
 │   │   └── sections/                  # seções por norma
-│   │       ├── nbr6120/               # 13 seções (manual)
-│   │       └── nbr6123/               # 166 seções (auto)
+│   │       ├── nbr6120/               # 13 seções
+│   │       └── nbr6123/               # 166 seções
 │   └── eval/
 │       ├── golden_set.json            # 21 perguntas de avaliação
-│       └── rubrica_respostas.json     # respostas geradas (após gerar_rubrica.py)
+│       ├── rubrica_respostas.json     # respostas dense (após gerar_rubrica.py)
+│       ├── rubrica_respostas_sparse.json   # respostas sparse
+│       ├── rubrica_respostas_hybrid.json   # respostas hybrid
+│       ├── rubrica_detalhada.md       # análise qualitativa manual
+│       └── ragas_scores.json          # métricas RAGAS automáticas
 ├── index/                             # índice FAISS salvo (gerado pelo notebook)
 ├── notebooks/
 │   └── rag_normas.ipynb              # notebook principal
 ├── scripts/
 │   ├── convert_pdfs.py               # PDF → Markdown (Docling)
-│   ├── split_sections_auto.py        # Markdown → seções
+│   ├── split_sections_auto.py        # Markdown → seções (NBR6123)
+│   ├── split_nbr6120_sections.py     # segmentação manual NBR6120
 │   └── gerar_rubrica.py              # gera respostas para avaliação manual
 ├── src/
 │   ├── ingestion.py                  # carrega seções com metadados
@@ -194,8 +308,11 @@ pln-rag-normas-estruturais/
 │   ├── indexer.py                    # BERTimbau + FAISS
 │   ├── hybrid_search.py              # BM25 + RRF (Trilha A)
 │   ├── rag_pipeline.py               # pipeline completo RAG
-│   ├── prompts.py                    # templates de prompt (grounding)
+│   ├── prompts.py                    # templates de prompt (grounding + recusa)
 │   └── evaluator.py                  # Recall@k + rubrica
+├── RELATORIO.md                      # relatório técnico completo
+├── apresentacao.md                   # apresentação em Markdown
+├── apresentacao.pdf                  # apresentação em PDF
 ├── .env.example
 ├── requirements.txt
 └── README.md
@@ -210,7 +327,8 @@ pln-rag-normas-estruturais/
 | Extração de PDF | Docling                                                      |
 | Embeddings      | `neuralmind/bert-base-portuguese-cased` (BERTimbau, dim=768) |
 | Índice vetorial | FAISS `IndexFlatIP` (cosseno exato)                          |
-| Busca léxica    | BM25Okapi (`rank-bm25`)                                      |
+| Busca léxica    | BM25Okapi (`rank-bm25`) + stemming RSLP PT-BR                |
 | Fusão híbrida   | Reciprocal Rank Fusion (k_RRF=60)                            |
 | LLM (geração)   | Groq (llama-3.3-70b) / Google Gemini / NVIDIA NIM            |
 | Interface       | Gradio                                                       |
+| Avaliação auto  | RAGAS (faithfulness)                                         |

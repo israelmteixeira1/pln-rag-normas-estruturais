@@ -35,7 +35,7 @@ NORMS_METADATA: dict[str, dict[str, str]] = {
         "doc_id": "NBR6120",
         "titulo": "Cargas para o cálculo de estruturas de edificações",
         "fonte": "ABNT",
-        "edicao": "1980 (Errata 2000)",
+        "edicao": "2019",
     },
     "nbr6123": {
         "doc_id": "NBR6123",
