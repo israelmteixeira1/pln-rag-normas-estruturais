@@ -33,14 +33,16 @@ Chatbot técnico baseado em **RAG (Retrieval-Augmented Generation)** para consul
 
 **Granularidade:** 1 seção normativa = 1 chunk — sem subdivisão adicional.
 
-**Justificativa:** as seções das normas ABNT são unidades semânticas autocontidas — cada uma trata de um tema específico (ex.: cargas de vento por categoria de terreno). Subdividir introduziria fragmentação sem ganho de recall no domínio técnico-normativo.
+**Justificativa:** as seções das normas ABNT são em geral unidades semânticas coesas — cada uma trata de um tema específico (ex.: cargas de vento por categoria de terreno).
+
+**Limitação conhecida:** algumas seções da NBR 6123 ultrapassam 20.000 caracteres, acima do que modelos de embedding representam bem em um único vetor. A ausência de sobreposição entre chunks também pode prejudicar perguntas que dependem de informação distribuída entre seções adjacentes. Detalhes e próximos passos no `RELATORIO.md`.
 
 **Detalhes:**
 
 | Parâmetro          | Valor                                                          |
 | ------------------ | -------------------------------------------------------------- |
-| Tamanho médio      | ~1.850 chars/chunk (variável por seção)                        |
-| Overlap            | Não aplicado (seções são semanticamente independentes)         |
+| Mediana            | ~500 chars/chunk (varia de ~6 a ~65.000 chars)                 |
+| Sobreposição       | Nenhuma (seções normativas são hierarquicamente organizadas)   |
 | Títulos/cabeçalhos | Preservados como Markdown (`##`, `###`)                        |
 | Tabelas            | Preservadas em Markdown (ex.: tabelas de coeficientes NBR6123) |
 | Listas e fórmulas  | Preservadas como texto bruto                                   |
@@ -49,7 +51,7 @@ Chatbot técnico baseado em **RAG (Retrieval-Augmented Generation)** para consul
 
 ## Trilha implementada: A — Recuperação Híbrida (Sparse + Dense)
 
-Três modos de retrieval disponíveis:
+Três modos de retrieval disponíveis. Na avaliação experimental, o modo esparso (BM25) apresentou o melhor desempenho isolado neste corpus, enquanto o denso (BERTimbau) teve recall muito baixo — o vocabulário técnico-normativo não é bem representado pelo modelo genérico. O modo híbrido atinge o melhor resultado global em k=10. Detalhes completos no `RELATORIO.md`.
 
 | Modo     | Tecnologia                   | Descrição                               |
 | -------- | ---------------------------- | --------------------------------------- |
@@ -63,7 +65,7 @@ Três modos de retrieval disponíveis:
 
 - Modelo: `neuralmind/bert-base-portuguese-cased` (dim=768)
 - Índice: `IndexFlatIP` com vetores L2-normalizados (equivale a similaridade de cosseno exata)
-- Justificativa: busca exata (FlatIP) é viável com 290 chunks e garante precisão máxima
+- Justificativa: busca exata (FlatIP) é viável com 290 chunks — não há necessidade de índices aproximados
 
 **Sparse (BM25):**
 
@@ -76,7 +78,7 @@ Três modos de retrieval disponíveis:
 - Candidatos por retriever: `min(k×3, n_chunks)`
 - Fusão: `score(chunk) = Σ 1/(60 + rank)` — score RRF padrão da literatura
 - Deduplicação: via dicionário indexado por posição do chunk — cada chunk aparece uma única vez no resultado final
-- Parâmetro k_RRF=60: valor padrão amplamente adotado, garante suavidade na fusão de rankings
+- Parâmetro k_RRF=60: valor padrão da literatura
 
 ---
 
@@ -92,9 +94,7 @@ O chatbot executa o pipeline completo:
 
 ### Grounding e recusa
 
-O `src/prompts.py` define dois modos de prompt:
-
-O prompt inclui regras de grounding obrigatório, formato de citação `[NBRxxxx, Seção Y.Y]` e recusa explícita quando não há evidência nos trechos recuperados.
+O prompt (`src/prompts.py`) inclui regras de grounding obrigatório, formato de citação `[NBRxxxx, Seção Y.Y]` e recusa explícita quando não há evidência nos trechos recuperados.
 
 **Recusa adequada:** quando os trechos recuperados não contêm evidência suficiente, o modelo responde exclusivamente: _"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta."_
 
@@ -256,13 +256,11 @@ Os arquivos gerados em `data/eval/`:
 
 **Critérios por resposta:**
 
-| Critério     | Descrição                                  | Escala            |
-| ------------ | ------------------------------------------ | ----------------- |
-| Groundedness | Resposta suportada pelos trechos?          | 0–2               |
-| Correção     | Resposta correta conforme as normas?       | 0–2               |
-| Citações     | Cita trechos adequados?                    | 0–2               |
-| Alucinação   | Inventou algo fora do corpus?              | 0=sim, 1=não      |
-| Recusa       | Recusou corretamente quando sem evidência? | 0=não, 1=sim, N/A |
+| Critério       | Descrição                                  | Escala / Preenchimento        |
+| -------------- | ------------------------------------------ | ----------------------------- |
+| *Faithfulness* | Resposta suportada pelos trechos?          | 0–1 (automático via RAGAS)    |
+| Correção       | Resposta correta conforme as normas?       | S / P / N (manual — Marcelo)  |
+| Recusa         | Recusou corretamente quando sem evidência? | S / N / N/A (manual — Marcelo)|
 
 ---
 
