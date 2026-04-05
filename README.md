@@ -2,31 +2,32 @@
 
 Chatbot técnico baseado em **RAG (Retrieval-Augmented Generation)** para consulta às normas brasileiras de engenharia estrutural, com citações rastreáveis e avaliação experimental.
 
-**Grupo:** Eduardo Braga · Israel Magalhães · Marcelo Carvalho
+**Grupo:** Eduardo Braga, Israel Magalhães e Marcelo Carvalho
+
 **Disciplina:** Processamento de Linguagem Natural — IFG Pós-IA
 
 ---
 
 ## Corpus
 
-| Norma                           | Conteúdo                                           | Seções |
-| ------------------------------- | -------------------------------------------------- | ------ |
-| **NBR 6120:2019**               | Cargas para o cálculo de estruturas de edificações | 13     |
-| **NBR 6123:2023**               | Forças devidas ao vento em edificações             | 166    |
+| Norma             | Conteúdo                                           | Seções |
+| ----------------- | -------------------------------------------------- | ------ |
+| **NBR 6120:2019** | Cargas para o cálculo de estruturas de edificações | 13     |
+| **NBR 6123:2023** | Forças devidas ao vento em edificações             | 166    |
 
 **Total:** 179 seções · ~331 k caracteres
 
 ### Metadados por chunk
 
-| Campo      | Descrição                                        |
-| ---------- | ------------------------------------------------ |
-| `chunk_id` | Identificador único (ex.: `NBR6120_secao_3`)     |
-| `doc_id`   | Documento de origem (`NBR6120` ou `NBR6123`)     |
-| `titulo`   | Título da norma completa                         |
-| `fonte`    | Origem (`ABNT`)                                  |
-| `edicao`   | Edição/data da norma (ex.: `2019`)               |
-| `secao`    | Número da seção normativa                        |
-| `summary`  | Resumo gerado na segmentação                     |
+| Campo      | Descrição                                    |
+| ---------- | -------------------------------------------- |
+| `chunk_id` | Identificador único (ex.: `NBR6120_secao_3`) |
+| `doc_id`   | Documento de origem (`NBR6120` ou `NBR6123`) |
+| `titulo`   | Título da norma completa                     |
+| `fonte`    | Origem (`ABNT`)                              |
+| `edicao`   | Edição/data da norma (ex.: `2019`)           |
+| `secao`    | Número da seção normativa                    |
+| `summary`  | Resumo gerado na segmentação                 |
 
 ### Estratégia de chunking
 
@@ -36,13 +37,13 @@ Chatbot técnico baseado em **RAG (Retrieval-Augmented Generation)** para consul
 
 **Detalhes:**
 
-| Parâmetro              | Valor                                                          |
-| ---------------------- | -------------------------------------------------------------- |
-| Tamanho médio          | ~1.850 chars/chunk (variável por seção)                        |
-| Overlap                | Não aplicado (seções são semanticamente independentes)         |
-| Títulos/cabeçalhos     | Preservados como Markdown (`##`, `###`)                        |
-| Tabelas                | Preservadas em Markdown (ex.: tabelas de coeficientes NBR6123) |
-| Listas e fórmulas      | Preservadas como texto bruto                                   |
+| Parâmetro          | Valor                                                          |
+| ------------------ | -------------------------------------------------------------- |
+| Tamanho médio      | ~1.850 chars/chunk (variável por seção)                        |
+| Overlap            | Não aplicado (seções são semanticamente independentes)         |
+| Títulos/cabeçalhos | Preservados como Markdown (`##`, `###`)                        |
+| Tabelas            | Preservadas em Markdown (ex.: tabelas de coeficientes NBR6123) |
+| Listas e fórmulas  | Preservadas como texto bruto                                   |
 
 ---
 
@@ -59,16 +60,19 @@ Três modos de retrieval disponíveis:
 ### Parâmetros dos retrievers
 
 **Dense (BERTimbau + FAISS):**
+
 - Modelo: `neuralmind/bert-base-portuguese-cased` (dim=768)
 - Índice: `IndexFlatIP` com vetores L2-normalizados (equivale a similaridade de cosseno exata)
 - Justificativa: busca exata (FlatIP) é viável com 179 chunks e garante precisão máxima
 
 **Sparse (BM25):**
+
 - Implementação: `BM25Okapi` (parâmetros padrão: k1=1.5, b=0.75)
 - Tokenização: lowercase → remoção de diacríticos → stemming RSLP PT-BR
 - Justificativa: termos normativos específicos (ex.: "NBR 6120", "coeficiente de arrasto") se beneficiam de busca exata por token
 
 **Hybrid (RRF):**
+
 - Candidatos por retriever: `min(k×3, n_chunks)`
 - Fusão: `score(chunk) = Σ 1/(60 + rank)` — score RRF padrão da literatura
 - Deduplicação: via dicionário indexado por posição do chunk — cada chunk aparece uma única vez no resultado final
@@ -90,18 +94,19 @@ O chatbot executa o pipeline completo:
 
 O `src/prompts.py` define dois modos de prompt:
 
-| Modo       | Técnicas                                                          |
-| ---------- | ----------------------------------------------------------------- |
-| `baseline` | Grounding obrigatório + formato de citação + recusa explícita     |
+| Modo       | Técnicas                                                                                     |
+| ---------- | -------------------------------------------------------------------------------------------- |
+| `baseline` | Grounding obrigatório + formato de citação + recusa explícita                                |
 | `improved` | Tudo do baseline + chain-of-thought + verificação cruzada entre normas + formato estruturado |
 
-**Recusa adequada:** quando os trechos recuperados não contêm evidência suficiente, o modelo responde exclusivamente: *"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta."*
+**Recusa adequada:** quando os trechos recuperados não contêm evidência suficiente, o modelo responde exclusivamente: _"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta."_
 
 **Guardrails:** perguntas fora do domínio normativo (preços, marcas comerciais, orçamentos) são recusadas com explicação.
 
 ### Transparência
 
 A interface Gradio (Seção 10 do notebook) exibe:
+
 - Resposta gerada com citações
 - Trechos normativos recuperados (chunk_id, seção, score de relevância)
 - Modo de retrieval ativo (dense / sparse / hybrid)
@@ -220,11 +225,11 @@ Na célula Gradio, troque `demo.launch()` por `demo.launch(share=True)` para URL
 
 O arquivo `data/eval/golden_set.json` contém **21 perguntas** distribuídas em três categorias:
 
-| Categoria        | Qtd | Descrição                                           |
-| ---------------- | --- | --------------------------------------------------- |
-| `factual_direta` | 17  | Perguntas com resposta em uma seção específica      |
-| `multi_trecho`   | 3   | Perguntas que exigem combinar 2+ seções             |
-| `fora_do_corpus` | 1   | Pergunta fora do domínio (testa recusa do chatbot)  |
+| Categoria        | Qtd | Descrição                                          |
+| ---------------- | --- | -------------------------------------------------- |
+| `factual_direta` | 17  | Perguntas com resposta em uma seção específica     |
+| `multi_trecho`   | 3   | Perguntas que exigem combinar 2+ seções            |
+| `fora_do_corpus` | 1   | Pergunta fora do domínio (testa recusa do chatbot) |
 
 Cada entrada contém a pergunta, os `chunk_ids` relevantes esperados e a categoria.
 
@@ -244,13 +249,13 @@ python scripts/gerar_rubrica.py --retriever hybrid       # hybrid
 
 Os arquivos gerados em `data/eval/`:
 
-| Arquivo                          | Conteúdo                                          |
-| -------------------------------- | ------------------------------------------------- |
-| `rubrica_respostas.json`         | Perguntas + respostas do modo dense               |
-| `rubrica_respostas_sparse.json`  | Perguntas + respostas do modo sparse              |
-| `rubrica_respostas_hybrid.json`  | Perguntas + respostas do modo hybrid              |
-| `rubrica_detalhada.md`           | Análise qualitativa manual completa               |
-| `ragas_scores.json`              | Métricas automáticas RAGAS (faithfulness)         |
+| Arquivo                         | Conteúdo                                  |
+| ------------------------------- | ----------------------------------------- |
+| `rubrica_respostas.json`        | Perguntas + respostas do modo dense       |
+| `rubrica_respostas_sparse.json` | Perguntas + respostas do modo sparse      |
+| `rubrica_respostas_hybrid.json` | Perguntas + respostas do modo hybrid      |
+| `rubrica_detalhada.md`          | Análise qualitativa manual completa       |
+| `ragas_scores.json`             | Métricas automáticas RAGAS (faithfulness) |
 
 **Critérios por resposta:**
 
@@ -266,12 +271,12 @@ Os arquivos gerados em `data/eval/`:
 
 ## Entregáveis
 
-| Artefato            | Localização              | Descrição                                          |
-| ------------------- | ------------------------ | -------------------------------------------------- |
-| Repositório         | (este repositório)       | Código, corpus, índice e resultados de avaliação   |
-| Relatório técnico   | `RELATORIO.md`           | Decisões de chunking, retrieval, avaliação, trilha |
-| Apresentação        | `apresentacao.md` / `.pdf` | Slides da apresentação oral                      |
-| Interface           | Notebook Seção 10        | Gradio com citações e trechos recuperados visíveis |
+| Artefato          | Localização                | Descrição                                          |
+| ----------------- | -------------------------- | -------------------------------------------------- |
+| Repositório       | (este repositório)         | Código, corpus, índice e resultados de avaliação   |
+| Relatório técnico | `RELATORIO.md`             | Decisões de chunking, retrieval, avaliação, trilha |
+| Apresentação      | `apresentacao.md` / `.pdf` | Slides da apresentação oral                        |
+| Interface         | Notebook Seção 10          | Gradio com citações e trechos recuperados visíveis |
 
 ---
 
