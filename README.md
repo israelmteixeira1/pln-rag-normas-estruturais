@@ -12,10 +12,10 @@ Chatbot técnico baseado em **RAG (Retrieval-Augmented Generation)** para consul
 
 | Norma             | Conteúdo                                           | Seções |
 | ----------------- | -------------------------------------------------- | ------ |
-| **NBR 6120:2019** | Cargas para o cálculo de estruturas de edificações | 13     |
+| **NBR 6120:2019** | Cargas para o cálculo de estruturas de edificações | 124    |
 | **NBR 6123:2023** | Forças devidas ao vento em edificações             | 166    |
 
-**Total:** 179 seções · ~331 k caracteres
+**Total:** 290 seções · ~626 k caracteres
 
 ### Metadados por chunk
 
@@ -63,7 +63,7 @@ Três modos de retrieval disponíveis:
 
 - Modelo: `neuralmind/bert-base-portuguese-cased` (dim=768)
 - Índice: `IndexFlatIP` com vetores L2-normalizados (equivale a similaridade de cosseno exata)
-- Justificativa: busca exata (FlatIP) é viável com 179 chunks e garante precisão máxima
+- Justificativa: busca exata (FlatIP) é viável com 290 chunks e garante precisão máxima
 
 **Sparse (BM25):**
 
@@ -94,10 +94,7 @@ O chatbot executa o pipeline completo:
 
 O `src/prompts.py` define dois modos de prompt:
 
-| Modo       | Técnicas                                                                                     |
-| ---------- | -------------------------------------------------------------------------------------------- |
-| `baseline` | Grounding obrigatório + formato de citação + recusa explícita                                |
-| `improved` | Tudo do baseline + chain-of-thought + verificação cruzada entre normas + formato estruturado |
+O prompt inclui regras de grounding obrigatório, formato de citação `[NBRxxxx, Seção Y.Y]` e recusa explícita quando não há evidência nos trechos recuperados.
 
 **Recusa adequada:** quando os trechos recuperados não contêm evidência suficiente, o modelo responde exclusivamente: _"Não encontrei informação suficiente nas normas consultadas para responder esta pergunta."_
 
@@ -192,7 +189,7 @@ Execute as células em ordem:
 | Seção | O que faz                                           |
 | ----- | --------------------------------------------------- |
 | 0     | Configura ambiente e variáveis                      |
-| 1     | Carrega as 179 seções normativas                    |
+| 1     | Carrega as 290 seções normativas                    |
 | 2     | Gera chunks (1 por seção)                           |
 | 3     | Carrega BERTimbau e constrói índice FAISS           |
 | 4     | Testa retriever denso                               |
@@ -290,7 +287,7 @@ pln-rag-normas-estruturais/
 │   │   ├── NBR6123_2023.pdf
 │   │   ├── md/                        # markdown gerado pelo Docling
 │   │   └── sections/                  # seções por norma
-│   │       ├── nbr6120/               # 13 seções
+│   │       ├── nbr6120/               # 124 seções
 │   │       └── nbr6123/               # 166 seções
 │   └── eval/
 │       ├── golden_set.json            # 21 perguntas de avaliação
