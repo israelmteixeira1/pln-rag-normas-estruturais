@@ -1,14 +1,14 @@
 # Rubrica Qualitativa — Detalhe por Questão
 
-> **Instruções para Marcelo:** preencha as colunas **Correção** e **Recusa** nas tabelas
-> de cada questão. As colunas *Faithfulness (RAGAS)* e *Hit?* estão preenchidas automaticamente.
+> **Avaliação manual por Marcelo Carvalho** — colunas **Correção** e **Recusa** preenchidas
+> com base em consulta direta às normas. As colunas *Faithfulness (RAGAS)* e *Hit?* são automáticas.
 
 **Critérios a preencher:**
 
 | Critério | Escala |
 |---|---|
-| **Correção** | 0 = incorreta · 1 = parcialmente correta · 2 = correta conforme a norma |
-| **Recusa** | 0 = deveria responder mas recusou · 1 = recusa correta · N/A = respondeu (avaliar Correção) |
+| **Correção** | S = correta · P = parcialmente correta · N = incorreta |
+| **Recusa** | S = recusa correta · N = deveria responder mas recusou · N/A = respondeu (avaliar Correção) |
 
 **Faithfulness (RAGAS):** 0–1 — mede se as afirmações da resposta estão suportadas nos trechos
 recuperados. Para respostas de recusa, RAGAS tende a marcar 0 (a frase de recusa não aparece
@@ -22,9 +22,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | ✗ | ✗ recusou | 1.00 | ___ | ___ |
-| Hybrid | ✗ | ✗ recusou | 1.00 | ___ | ___ |
+| Dense  | ✗ | ✗ recusou | 0.00 | N | N |
+| Sparse | ✗ | ✗ recusou | 1.00 | N | N |
+| Hybrid | ✗ | ✗ recusou | 1.00 | N | N |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `83_52_peso_próprio_da_estrutura` · `59_peso_específico_aparente` · `116_92_velocidade_de_projeto_para_anális` · `117_93_modelo_contínuo_simplificado` · `127_961_cálculo_da_amplitude_de_aceleraç`
@@ -55,9 +55,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
+| Dense  | ✗ | ✗ recusou | 0.00 | N | N |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 1.00 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `63_tara` · `57_pbt` · `29_ações_permanentes` · `121_c4_fadiga` · `83_52_peso_próprio_da_estrutura`
@@ -115,9 +115,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✓ respondeu | 0.50 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 0.67 | ___ | ___ |
+| Dense  | ✗ | ✓ respondeu | 0.50 | S | N/A |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 0.67 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.50)
 **Chunks top-5:** `83_52_peso_próprio_da_estrutura` · `63_tara` · `59_peso_específico_aparente` · `57_pbt` · `61_peso_próprio`
@@ -171,9 +171,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
+| Dense  | ✗ | ✗ recusou | 0.00 | N | N |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 1.00 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `10_ações_para_o_cálculo_de_estruturas_de` · `35_ações_variáveis_normais` · `97_723_forças_em_placas_localizadas_acim` · `77_624_coeficientes_de_pressão_externa_e` · `94_72_coberturas_isoladas_a_águas_planas`
@@ -221,9 +221,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
+| Dense  | ✗ | ✗ recusou | 0.00 | N | N |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 1.00 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `83_52_peso_próprio_da_estrutura` · `59_peso_específico_aparente` · `63_tara` · `10_ações_para_o_cálculo_de_estruturas_de` · `36_310_ângulo_de_atrito_interno`
@@ -256,9 +256,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✓ respondeu | 1.00 | ___ | ___ |
-| Sparse | ✗ | ✓ respondeu | 0.75 | ___ | ___ |
-| Hybrid | ✗ | ✓ respondeu | 1.00 | ___ | ___ |
+| Dense  | ✗ | ✓ respondeu | 1.00 | S | N/A |
+| Sparse | ✗ | ✓ respondeu | 0.75 | S | N/A |
+| Hybrid | ✗ | ✓ respondeu | 1.00 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 1.00)
 **Chunks top-5:** `121_c4_fadiga` · `92_tabela_10_continuação` · `29_ações_permanentes` · `33_ações_variáveis_especiais` · `83_52_peso_próprio_da_estrutura`
@@ -298,9 +298,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
+| Dense  | ✗ | ✗ recusou | 0.00 | N | N |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 1.00 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `39_sem_acesso_controlado` · `42_com_acesso_controlado` · `71_vias_particulares` · `31_ações_variáveis` · `77_624_coeficientes_de_pressão_externa_e`
@@ -342,9 +342,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 0.86 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 0.83 | ___ | ___ |
+| Dense  | ✗ | ✗ recusou | 0.00 | N | N |
+| Sparse | ✓ | ✓ respondeu | 0.86 | N | N/A |
+| Hybrid | ✓ | ✓ respondeu | 0.83 | N | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `33_ações_variáveis_especiais` · `121_c4_fadiga` · `31_ações_variáveis` · `29_ações_permanentes` · `35_ações_variáveis_normais`
@@ -386,9 +386,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
+| Dense  | ✗ | ✗ recusou | 0.00 | N | N |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 1.00 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `139_1112_simultaneidade_de_ações` · `10_ações_para_o_cálculo_de_estruturas_de` · `94_72_coberturas_isoladas_a_águas_planas` · `90_643_pela_turbulência_da_esteira` · `44_barreiras_de_veículos`
@@ -451,9 +451,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
+| Dense  | ✗ | ✗ recusou | 0.00 | N | N |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 1.00 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `121_c4_fadiga` · `139_1112_simultaneidade_de_ações` · `29_ações_permanentes` · `73_62_edificações_com_superfícies_curvas` · `31_ações_variáveis`
@@ -492,9 +492,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 0.80 | ___ | ___ |
+| Dense  | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 0.80 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 1.00)
 **Chunks top-5:** `116_92_velocidade_de_projeto_para_anális` · `52_51_velocidade_básica_do_vento_v0` · `127_961_cálculo_da_amplitude_de_aceleraç` · `35_vento_básico` · `132_102_critério_para_verificação_do_efe`
@@ -531,9 +531,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
+| Dense  | ✗ | ✗ recusou | 0.00 | N | N |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 1.00 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `48_coeficiente_dinâmico` · `52_51_velocidade_básica_do_vento_v0` · `140_112_escolha_do_tipo_de_análise` · `127_961_cálculo_da_amplitude_de_aceleraç` · `116_92_velocidade_de_projeto_para_anális`
@@ -579,9 +579,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✓ respondeu | 0.83 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 0.25 | ___ | ___ |
+| Dense  | ✗ | ✓ respondeu | 0.83 | P | N/A |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 0.25 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.83)
 **Chunks top-5:** `48_coeficiente_dinâmico` · `124_944_combinação_das_contribuições_mod` · `132_102_critério_para_verificação_do_efe` · `121_941_definições` · `156_a1_fator_s_2`
@@ -653,9 +653,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
+| Dense  | ✗ | ✗ recusou | 0.00 | N | N |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 1.00 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `44_4_procedimento_para_o_cálculo_das_for` · `83_52_peso_próprio_da_estrutura` · `116_92_velocidade_de_projeto_para_anális` · `52_51_velocidade_básica_do_vento_v0` · `132_102_critério_para_verificação_do_efe`
@@ -710,9 +710,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✓ respondeu | N/D | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 1.00 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | N/D | ___ | ___ |
+| Dense  | ✗ | ✓ respondeu | N/D | P | N/A |
+| Sparse | ✓ | ✓ respondeu | 1.00 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | N/D | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = N/D)
 **Chunks top-5:** `44_4_procedimento_para_o_cálculo_das_for` · `116_92_velocidade_de_projeto_para_anális` · `52_51_velocidade_básica_do_vento_v0` · `132_102_critério_para_verificação_do_efe` · `124_944_combinação_das_contribuições_mod`
@@ -757,9 +757,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | ✗ | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | ✓ | ✓ respondeu | 0.67 | ___ | ___ |
-| Hybrid | ✓ | ✓ respondeu | 0.67 | ___ | ___ |
+| Dense  | ✗ | ✗ recusou | 0.00 | N | N |
+| Sparse | ✓ | ✓ respondeu | 0.67 | S | N/A |
+| Hybrid | ✓ | ✓ respondeu | 0.67 | S | N/A |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `48_coeficiente_dinâmico` · `124_944_combinação_das_contribuições_mod` · `83_52_peso_próprio_da_estrutura` · `132_102_critério_para_verificação_do_efe` · `121_941_definições`
@@ -792,9 +792,9 @@ nos chunks) — isso **não indica alucinação**, é uma limitação conhecida 
 
 | Modo | Hit? | Respondeu? | Faithfulness (RAGAS) | **Correção** | **Recusa** |
 |------|:----:|:----------:|:--------------------:|:------------:|:----------:|
-| Dense  | — | ✗ recusou | 0.00 | ___ | ___ |
-| Sparse | — | ✗ recusou | 0.00 | ___ | ___ |
-| Hybrid | — | ✗ recusou | 0.00 | ___ | ___ |
+| Dense  | — | ✗ recusou | 0.00 | — | S |
+| Sparse | — | ✗ recusou | 0.00 | — | S |
+| Hybrid | — | ✗ recusou | 0.00 | — | S |
 
 ### Dense &nbsp;(Faithfulness = 0.00)
 **Chunks top-5:** `10_ações_para_o_cálculo_de_estruturas_de` · `83_52_peso_próprio_da_estrutura` · `35_ações_variáveis_normais` · `116_92_velocidade_de_projeto_para_anális` · `117_93_modelo_contínuo_simplificado`
